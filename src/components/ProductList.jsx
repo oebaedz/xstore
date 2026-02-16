@@ -1,7 +1,6 @@
 import { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import data_product from "../assets/data";
-import GroupedCard from "./GroupedCard";  // New component
 import { StoreContext } from "../StoreContext";
 import supabase from "./createClient";
 import NewHero from "./NewHero";
@@ -49,24 +48,26 @@ function groupProductsByCategory(products) {
   return result;
 }
 
-const groupedData = groupProductsByCategory(data_product);
-
-
-const { data: dataProducts } = await supabase 
-.from('products')
-.select('*');
-
-// useEffect(() => {
-//   console.log('Data:', dataProducts);
-// }, []);
 
 const ProductList = () => {
   const { items } = useContext(StoreContext);
+  const [dataProducts, setDataProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const fetchAdminData = async () => {
+      setLoading(true);
+      // Kita ambil data secara paralel agar cepat
+      const [prodRes] = await Promise.all([
+        supabase.from('products').select('*').order('name', { ascending: false }),
+      ]);
   
-
-  // Current step is always 1 for product list
-  const currentStep = 1;
-
+      setDataProducts(prodRes.data || []);
+      setLoading(false);
+    };
+  
+  useEffect(() => {
+    fetchAdminData();
+  }, []);
+  
   return (
     <div className="min-h-screen">
       <div className="flex flex-col h-[100svh] md:h-auto overflow-hidden">
