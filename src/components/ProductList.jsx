@@ -1,56 +1,13 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import data_product from "../assets/data";
 import { StoreContext } from "../StoreContext";
 import supabase from "./createClient";
 import NewHero from "./NewHero";
 import ProductCard from "./newcomps/ProductCard";
-
-// Function to group products by their main category (the numbered part with name)
-function groupProductsByCategory(products) {
-  const grouped = {};
-
-  products.forEach(product => {
-    // Extract the main category (number + main name), e.g. "02 Dua Kiai", "03 Semua Masyayikh"
-    const nameParts = product.name.split(' - ');
-    const baseName = nameParts[0];
-
-    if (!grouped[baseName]) {
-      grouped[baseName] = {
-        id: baseName, // Use base name as ID
-        name: baseName,
-        image: product.image, // Use the first image as the main image
-        desc: product.desc,
-        variants: []
-      };
-    }
-
-    // Add variant information
-    const variantInfo = {
-      id: product.id,
-      name: product.name,
-      image: product.image,
-      desc: product.desc,
-      subt: product.subt,
-      price: product.price
-    };
-
-    grouped[baseName].variants.push(variantInfo);
-  });
-
-  // Convert to array and sort by the number at the beginning of the name
-  const result = Object.values(grouped).sort((a, b) => {
-    const numA = parseInt(a.name.split(' ')[0]);
-    const numB = parseInt(b.name.split(' ')[0]);
-    return numA - numB;
-  });
-
-  return result;
-}
-
+import CartSidebar from "./newcomps/CartSidebar";
 
 const ProductList = () => {
-  const { items } = useContext(StoreContext);
+  const { items, setItems, isCartOpen, setIsCartOpen } = useContext(StoreContext);
   const [dataProducts, setDataProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const fetchAdminData = async () => {
@@ -96,7 +53,7 @@ const ProductList = () => {
               return (
                 <div key={data.id}>
                   {/* <GroupedCard productGroup={productGroup} /> */}
-                  <ProductCard product={data} />
+                  <ProductCard product={data} setIsCartOpen={setIsCartOpen} />
                 </div>
               );
             })}
@@ -104,7 +61,9 @@ const ProductList = () => {
         </div>
       </section>
 
-      {items.length > 0 && (
+      <CartSidebar items={items} setItems={setItems} onClose={() => setIsCartOpen(!isCartOpen)} isOpen={isCartOpen} />
+
+      {/* {items.length > 0 && (
         <div className="flex justify-center my-12">
           <Link
             to="/review"
@@ -113,7 +72,7 @@ const ProductList = () => {
             Review Pesanan ({items.length} {items.length === 1 ? 'item' : 'items'})
           </Link>
         </div>
-      )}
+      )} */}
     </div>
   );
 };

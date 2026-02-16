@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import { StoreContext } from "../../StoreContext";
 import Alert from "../Alert";
 
-export default function ProductCard( { product } ) {
+export default function ProductCard( { product, setIsCartOpen } ) {
   const { items, addToCart } = useContext(StoreContext);
   const [alert, setAlert] = useState(false);
   const [selectedVariant, setSelectedVariant] = useState(product.variants[0].id);
@@ -32,7 +32,8 @@ export default function ProductCard( { product } ) {
 
       console.log("Adding to cart:", payload);
       addToCart(payload);
-      setAlert(true);
+      setIsCartOpen(true)
+      // setAlert(true);
       setTimeout(() => {
         setAlert(false);
       }, 5000);

@@ -21,6 +21,7 @@ function App() {
   const itemsFromLocalStorage = JSON.parse(localStorage.getItem('cart')) || []
 
   const [items, setItems] = useState(itemsFromLocalStorage);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   useEffect(() => {
     localStorage.setItem('cart', JSON.stringify(items))
@@ -43,6 +44,8 @@ function App() {
     items,
     setItems,
     addToCart,
+    isCartOpen,
+    setIsCartOpen,
   };
 
   return (
