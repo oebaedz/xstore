@@ -42,7 +42,7 @@ const Navbar = () => {
             <div
               tabIndex={0}
               role="button"
-              className="btn btn-ghost btn-circle"
+              className="btn btn-ghost btn-circle text-gold border border-gold"
               onClick={() => setIsCartOpen(!isCartOpen)}
             >
               <div className="indicator">

@@ -17,7 +17,6 @@ const CartSidebar = ({ isOpen, onClose, items, setItems, onCheckout }) => {
   };
 
   const total = items.reduce((acc, item) => acc + (item.price * item.qty), 0);
-  console.log(items)
 
   return (
     <>
@@ -54,7 +53,7 @@ const CartSidebar = ({ isOpen, onClose, items, setItems, onCheckout }) => {
         </div>
 
         {/* Content Section */}
-        <div className="flex flex-col h-[calc(100vh-110px)]">
+        <div className="flex flex-col h-[calc(100vh-150px)]">
           <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-2 md:space-y-6 custom-scrollbar">
             {items.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-center space-y-4">
