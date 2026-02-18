@@ -5,6 +5,7 @@ import { useToast } from '../context/ToastContext';
 
 const ProductForm = ({ existingProduct, onSaveSuccess }) => {
   const [loading, setLoading] = useState(false);
+  const { showToast } = useToast();
   const [product, setProduct] = useState({
     name: '',
     desc: '',
@@ -44,8 +45,6 @@ const ProductForm = ({ existingProduct, onSaveSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
-    const { showToast } = useToast();
 
     const { error } = existingProduct 
       ? await supabase.from('products').update(product).eq('id', product.id)

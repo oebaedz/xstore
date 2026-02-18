@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState } from 'react';
 import { CheckCircle, XCircle, AlertCircle, X } from 'lucide-react';
 
-const ToastContext = createContext();
 
+const ToastContext = createContext();
 export const ToastProvider = ({ children }) => {
   const [toasts, setToasts] = useState([]);
 
