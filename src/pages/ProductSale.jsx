@@ -58,7 +58,7 @@ const ProductSale = () => {
       />
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-slate-800">Daftar Produk</h2>
-        <button onClick={() => onEdit(null)} className="bg-accent text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-accent/20 hover:bg-accent/50 transition-all">
+        <button onClick={() => onEdit(null)} className="bg-accent-green text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-accent/20 hover:bg-accent/50 transition-all">
           + Produk Baru
         </button>
       </div>
@@ -72,7 +72,7 @@ const ProductSale = () => {
                 className="w-full h-full object-contain rounded-2xl" 
                 alt={product.name}
               />
-              <div className="absolute top-2 right-2 bg-accent backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold text-black shadow-sm">
+              <div className="absolute top-2 right-2 bg-gold backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold text-black shadow-sm">
                 {product.category}
               </div>
             </div>

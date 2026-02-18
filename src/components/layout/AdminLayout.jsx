@@ -39,7 +39,7 @@ const AdminLayout = ({ children }) => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
+    <div className="min-h-screen bg-slate-50 font-body flex">
       {/* SIDEBAR OVERLAY (Mobile) */}
       <div 
         className={`fixed inset-0 bg-slate-900/50 z-40 lg:hidden transition-opacity ${isSidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
@@ -49,8 +49,8 @@ const AdminLayout = ({ children }) => {
       {/* SIDEBAR */}
       <aside className={`fixed lg:static inset-y-0 left-0 w-64 bg-white border-r border-slate-100 z-50 transform transition-transform lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-6">
-          <h1 className="text-xl font-bold text-indigo-600 flex items-center gap-2">
-            <div className="w-8 h-8 bg-indigo-600 overflow-hidden rounded-lg">
+          <h1 className="text-xl font-bold text-accent-green-dark flex items-center gap-2">
+            <div className="w-8 h-8 bg-accent-green-dark overflow-hidden rounded-lg">
               <img src="https://st2.depositphotos.com/3867453/5975/v/450/depositphotos_59751285-stock-illustration-letter-x-logo-icon-design.jpg" alt="logo" />
             </div>
             IXADA Store
@@ -62,7 +62,7 @@ const AdminLayout = ({ children }) => {
             <Link 
             key={item.name} to={item.path} 
             onClick={() => setIsSidebarOpen(false)}
-            className="flex items-center gap-3 p-3 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 rounded-xl transition-all">
+            className="flex items-center gap-3 p-3 text-slate-600 hover:bg-indigo-50 hover:text-accent-green-dark rounded-xl transition-all">
               {item.icon}
               <span className="font-medium">{item.name}</span>
             </Link>
@@ -94,9 +94,7 @@ const AdminLayout = ({ children }) => {
         </header>
 
         <main className="p-4 lg:p-8 overflow-y-auto">
-          {loading ? <div>Memuat Data...</div> :
-            <Outlet context={{ products, orders, refreshData: fetchAdminData }} />
-          }
+          <Outlet context={{ products, orders, refreshData: fetchAdminData, loading, setLoading }} />
         </main>
       </div>
     </div>

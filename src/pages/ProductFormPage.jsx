@@ -16,11 +16,11 @@ const ProductFormPage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <button onClick={() => navigate(-1)} className="text-slate-400">← Kembali</button>
+      <div className="flex justify-between items-center gap-4">
         <h2 className="text-2xl font-bold text-slate-800">
           {id ? 'Edit Produk' : 'Tambah Produk Baru'}
         </h2>
+        <button onClick={() => navigate(-1)} className="text-slate-400">← Kembali</button>
       </div>
       
       {/* Kirim data ke komponen form */}

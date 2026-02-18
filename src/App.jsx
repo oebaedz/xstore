@@ -58,10 +58,10 @@ function App() {
               <Route path="/" element={<ProductList />} />
               <Route path="/review" element={<ReviewOrder />} />
               <Route path="/checkout" element={<OrdererInfo />} />
-              <Route path="/login" element={<Login />} />
               <Route path="*" element={<Navigate to="/" />} />
             </Route>
 
+            <Route path="/login" element={<Login />} />
             <Route path="/v2" element={<Nyoba />} />
 
             <Route element={

@@ -73,14 +73,14 @@ const DashboardHome = () => {
     return (
         <div className="space-y-8 pb-10">
             {/* SECTION: GAMIFIED HEADER */}
-            <section className="bg-indigo-600 rounded-[32px] p-6 text-white shadow-xl shadow-indigo-200">
+            <section className="bg-gradient-to-r from-green-800 to-accent-green-dark rounded-[32px] p-6 text-white shadow-xl shadow-indigo-200">
                 <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-3">
                     <div className="p-2 bg-white/20 rounded-xl backdrop-blur-md">
                     <Trophy className="w-6 h-6 text-yellow-300" />
                     </div>
                     <div>
-                    <p className="text-xs font-bold opacity-80 uppercase tracking-wider">Level Pendekar</p>
+                    <p className="text-xs font-bold opacity-80 uppercase tracking-wider">Level Warrior</p>
                     <h2 className="text-xl font-black italic">LEVEL {currentLevel}</h2>
                     </div>
                 </div>
