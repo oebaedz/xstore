@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, Package, ShoppingCart, Menu, X, LogOut } from 'lucide-react';
-import { Link, Outlet, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { LayoutDashboard, Package, ShoppingCart, Menu, LogOut } from 'lucide-react';
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import supabase from '../createClient'
 
 const AdminLayout = ({ children }) => {
@@ -15,57 +15,68 @@ const AdminLayout = ({ children }) => {
     { name: 'Produk', icon: <Package size={20} />, path: '/products' },
     { name: 'Pesanan', icon: <ShoppingCart size={20} />, path: '/orders' },
   ];
+  const fetchAdminData = useCallback(async () => {
+    try {
+      setLoading(true);
+      // Kita ambil data secara paralel agar cepat
+      const [prodRes, orderRes] = await Promise.all([
+        supabase.from('products').select('*').order('name', { ascending: false }),
+        supabase.from('orders').select('*').order('created_at', { ascending: false })
+      ]);
+
+      if (prodRes.error) throw prodRes.error;
+      if (orderRes.error) throw orderRes.error;
+
+      setProducts(prodRes.data || []);
+      setOrders(orderRes.data || []);
+    } catch (error) {
+      console.error('Error fetching admin data:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     fetchAdminData();
-  }, []);
+  }, [fetchAdminData]);
 
-  const fetchAdminData = async () => {
-    setLoading(true);
-    // Kita ambil data secara paralel agar cepat
-    const [prodRes, orderRes] = await Promise.all([
-      supabase.from('products').select('*').order('name', { ascending: false }),
-      supabase.from('orders').select('*').order('created_at', { ascending: false })
-    ]);
-
-    setProducts(prodRes.data || []);
-    setOrders(orderRes.data || []);
-    setLoading(false);
-  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    navigate('/login');
+    navigate('/login', { replace: true });
   }
 
   return (
     <div className="min-h-screen bg-slate-50 font-body flex">
       {/* SIDEBAR OVERLAY (Mobile) */}
       <div 
-        className={`fixed inset-0 bg-slate-900/50 z-40 lg:hidden transition-opacity ${isSidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        className={`fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 lg:hidden transition-opacity ${isSidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         onClick={() => setIsSidebarOpen(false)}
       ></div>
 
       {/* SIDEBAR */}
       <aside className={`fixed lg:static inset-y-0 left-0 w-64 bg-white border-r border-slate-100 z-50 transform transition-transform lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="p-6">
-          <h1 className="text-xl font-bold text-accent-green-dark flex items-center gap-2">
-            <div className="w-8 h-8 bg-accent-green-dark overflow-hidden rounded-lg">
-              <img src="https://st2.depositphotos.com/3867453/5975/v/450/depositphotos_59751285-stock-illustration-letter-x-logo-icon-design.jpg" alt="logo" />
-            </div>
-            IXADA Store
-          </h1>
+        <div className="p-6 flex items-center gap-3">
+          <div className="w-9 h-9 bg-emerald-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-emerald-100">
+            X
+          </div>
+          <h1 className="text-lg font-bold text-slate-800 tracking-tight">IXADA <span className="text-emerald-500">Store</span></h1>
         </div>
         
         <nav className="mt-4 px-4 space-y-1">
           {menuItems.map((item) => (
-            <Link 
+            <NavLink 
             key={item.name} to={item.path} 
             onClick={() => setIsSidebarOpen(false)}
-            className="flex items-center gap-3 p-3 text-slate-600 hover:bg-indigo-50 hover:text-accent-green-dark rounded-xl transition-all">
+            className={({ isActive }) => `
+                flex items-center gap-3 p-3 rounded-xl font-medium transition-all
+                ${isActive 
+                  ? 'bg-emerald-50 border border-emerald-200 text-emerald-600 shadow-sm shadow-emerald-50' 
+                  : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'}
+              `}>
               {item.icon}
-              <span className="font-medium">{item.name}</span>
-            </Link>
+              <span>{item.name}</span>
+            </NavLink>
           ))}
         </nav>
 
@@ -79,22 +90,31 @@ const AdminLayout = ({ children }) => {
       {/* MAIN CONTENT */}
       <div className="flex-1 flex flex-col min-w-0">
         <header className="h-16 bg-white border-b border-slate-100 flex items-center justify-between px-4 lg:px-8">
-          <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-2 text-slate-600">
-            <Menu size={24} />
-          </button>
+          <div className="flex items-center gap-3">
+            <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-2 text-slate-600">
+              <Menu size={24} />
+            </button>
+            <Link to="/dashboard" className='flex items-center gap-3 lg:hidden'>
+              <h1 className="text-lg font-bold text-slate-800 tracking-tight">IXADA <span className="text-emerald-500">Store</span></h1>
+            </Link>
+          </div>
+
           <div className="flex items-center gap-3">
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-bold text-slate-800">Wadehel</p>
-              <p className="text-[10px] text-slate-400 uppercase font-bold">Mimin69</p>
+              <p className="text-sm font-bold text-slate-800 leading-none">Admin</p>
+              <p className="text-[10px] text-emerald-500 uppercase font-bold tracking-wider">Online</p>
             </div>
             <div className="w-10 h-10 rounded-full border-2 overflow-hidden border-white shadow-sm">
-              <img src="https://st2.depositphotos.com/3867453/5975/v/450/depositphotos_59751285-stock-illustration-letter-x-logo-icon-design.jpg" alt="mbae" />
+              <img src="https://ui-avatars.com/api/?name=Xa+No&background=10b981&color=fff" alt="avatar" />
             </div>
           </div>
         </header>
 
-        <main className="p-4 lg:p-8 overflow-y-auto">
-          <Outlet context={{ products, orders, refreshData: fetchAdminData, loading, setLoading }} />
+        <main className="lg:p-8 overflow-y-auto">
+          {loading && (
+            <div className="h-1 bg-emerald-500 animate-pulse w-full fixed top-16 z-[60]" />
+          )}
+          <Outlet context={{ products, orders, refreshData: fetchAdminData }} />
         </main>
       </div>
     </div>

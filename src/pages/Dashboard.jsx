@@ -94,7 +94,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="p-2 md:p-8 bg-slate-50 min-h-screen pb-10">
+    <div className="p-4 md:p-8 bg-slate-50 min-h-screen pb-10">
       <h1 className="text-xl md:text-2xl font-bold mb-6 text-slate-800">Manajemen Pesanan</h1>
 
       {/* --- SUMMARY BOARD ---

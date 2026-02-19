@@ -71,7 +71,7 @@ const DashboardHome = () => {
 
 
     return (
-        <div className="space-y-8 pb-10">
+        <div className="p-4 space-y-8 pb-10">
             {/* SECTION: GAMIFIED HEADER */}
             <section className="bg-gradient-to-r from-green-800 to-accent-green-dark rounded-[32px] p-6 text-white shadow-xl shadow-indigo-200">
                 <div className="flex justify-between items-center mb-4">

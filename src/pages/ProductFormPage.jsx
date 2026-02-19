@@ -1,5 +1,6 @@
 import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
 import ProductForm from './ProductForm'; // Komponen form yang kita buat sebelumnya
+import { ArrowBigLeftDash, ArrowBigLeftDashIcon } from 'lucide-react';
 
 const ProductFormPage = () => {
   const { id } = useParams(); // Ambil ID dari URL (jika ada)
@@ -20,7 +21,9 @@ const ProductFormPage = () => {
         <h2 className="text-2xl font-bold text-slate-800">
           {id ? 'Edit Produk' : 'Tambah Produk Baru'}
         </h2>
-        <button onClick={() => navigate(-1)} className="text-slate-400">← Kembali</button>
+        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-slate-400">
+          <ArrowBigLeftDashIcon size={24} /> Back
+        </button>
       </div>
       
       {/* Kirim data ke komponen form */}
