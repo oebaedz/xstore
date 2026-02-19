@@ -16,7 +16,7 @@ const ProductFormPage = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="p-4 lg:p-8 space-y-6">
       <div className="flex justify-between items-center gap-4">
         <h2 className="text-2xl font-bold text-slate-800">
           {id ? 'Edit Produk' : 'Tambah Produk Baru'}

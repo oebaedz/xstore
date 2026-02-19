@@ -1,5 +1,4 @@
 import { useContext, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { StoreContext } from "../StoreContext";
 import supabase from "./createClient";
 import NewHero from "./NewHero";
@@ -7,7 +6,7 @@ import ProductCard from "./newcomps/ProductCard";
 import CartSidebar from "./newcomps/CartSidebar";
 import CheckoutModal from "./newcomps/CheckoutModal";
 
-const ProductList = () => {
+const Home = () => {
   const { items, setItems, isCartOpen, setIsCartOpen } = useContext(StoreContext);
   const [dataProducts, setDataProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -89,4 +88,4 @@ const ProductList = () => {
   );
 };
 
-export default ProductList;
+export default Home;
