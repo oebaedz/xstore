@@ -9,6 +9,8 @@ import { Edit3, MessageCircle, X, Check  } from 'lucide-react';
 export default function Dashboard() {
   const { orders, refreshData } = useOutletContext();
   const { showToast } = useToast();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('semua');
 
   //State untuk modal
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -57,6 +59,18 @@ export default function Dashboard() {
     }
   };
 
+  const filteredOrders = orders.filter(order => {
+
+    const matchStatus = 
+      filterStatus === 'semua' ? true :
+      filterStatus === 'piutang' ? (order.status === 'belum' || order.status === 'dp') :
+      order.status === filterStatus;
+
+    const matchesSearch = order.nama.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    return matchesSearch && matchStatus;
+  })
+
   const handleKirimWA = (order) => {
     let pesan = "";
     
@@ -93,8 +107,34 @@ export default function Dashboard() {
         ))}
       </div> */}
 
+      {/* Search Bar */}
+      <input 
+        type="text"
+        placeholder="Cari nama pelanggan..."
+        className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 mb-4 shadow-sm outline-none focus:ring-2 focus:ring-green-500"
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+
+      {/* Horizontal Filter */}
+      <div className="flex gap-2 overflow-x-auto pb-4 no-scrollbar">
+        {['semua', 'piutang', 'dp', 'lunas'].map((f) => (
+          <button
+            key={f}
+            onClick={() => setFilterStatus(f)}
+            className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap capitalize transition-all ${
+              filterStatus === f 
+                ? 'bg-green-600 text-white shadow-md' 
+                : 'bg-white text-slate-500 border border-slate-200'
+            }`}
+            
+          >
+            {f === 'piutang' ? '💸 Belum Lunas' : f}
+          </button>
+        ))}
+      </div>
+
       <div className="flex flex-col gap-3">
-        {orders.map((order) => (
+        {filteredOrders.map((order) => (
           <div key={order.id} className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
             {/* Info Pelanggan */}
             <div className="flex-1">
@@ -138,10 +178,10 @@ export default function Dashboard() {
 
       {/* --- MODAL PEMBAYARAN --- */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[999] flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[999] flex items-start sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-200">
           <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
           
-          <div className="relative mx-1 bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl animate-in slide-in-from-bottom-10 duration-300">
+          <div className="relative m-1 bg-white w-full max-w-md rounded-3xl sm:rounded-3xl p-6 shadow-2xl animate-in slide-in-from-bottom-10 duration-300">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-lg font-bold text-slate-800">Update Pembayaran</h2>
               <button onClick={() => setIsModalOpen(false)} className="text-slate-400"><X /></button>
