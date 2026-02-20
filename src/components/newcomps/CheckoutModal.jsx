@@ -7,8 +7,7 @@ const CheckoutModal = ({ isOpen, onClose, items, setItems }) => {
 
   if (!isOpen) return null;
 
-  const subtotal = items.reduce((acc, item) => acc + (item.price * item.qty), 0);
-  const total = subtotal + 50000;
+  const total = items.reduce((acc, item) => acc + (item.price * item.qty), 0);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -67,7 +66,7 @@ const CheckoutModal = ({ isOpen, onClose, items, setItems }) => {
         
         {/* Header */}
         <div className="bg-primary p-6 text-white border-b-2 border-gold flex items-center justify-between">
-          <h2 className="font-display text-2xl font-bold text-gold italic uppercase tracking-tighter">Checkout</h2>
+          <h2 className="font-display text-2xl font-bold text-gold uppercase tracking-tighter">Checkout</h2>
           <button onClick={onClose} className="text-gold hover:text-white text-3xl">&times;</button>
         </div>
 
@@ -85,16 +84,16 @@ const CheckoutModal = ({ isOpen, onClose, items, setItems }) => {
               {/* Tab Navigation */}
               <div className="flex gap-4 mb-6 border-b-2 border-gray-100">
                 <button 
-                  className={`pb-3 px-4 font-semibold transition-all ${activeTab === 'review' ? 'text-primary border-b-2 border-accent-green' : 'text-gray-400 border-transparent'}`}
+                  className={`pb-3 px-2 transition-all ${activeTab === 'review' ? 'text-primary border-b-2 border-accent-green' : 'text-gray-400 border-transparent'}`}
                   onClick={() => setActiveTab('review')}
                 >
                   1. Review Pesanan
                 </button>
                 <button 
-                  className={`pb-3 px-4 font-semibold transition-all ${activeTab === 'form' ? 'text-primary border-b-2 border-accent-green' : 'text-gray-400 border-transparent'}`}
+                  className={`pb-3 px-2 transition-all ${activeTab === 'form' ? 'text-primary border-b-2 border-accent-green' : 'text-gray-400 border-transparent'}`}
                   onClick={() => items.length > 0 && setActiveTab('form')}
                 >
-                  2. Data Pengiriman
+                  2. Data Pemesan
                 </button>
               </div>
 
@@ -116,9 +115,7 @@ const CheckoutModal = ({ isOpen, onClose, items, setItems }) => {
                   </div>
 
                   <div className="bg-gray-100 p-4 rounded-sm mb-6 border border-border">
-                    <div className="flex justify-between mb-2 text-sm"><span className="text-gray-600">Subtotal:</span> <span className="font-semibold text-primary">Rp {subtotal.toLocaleString('id-ID')}</span></div>
-                    <div className="flex justify-between mb-2 text-sm"><span className="text-gray-600">Ongkir:</span> <span className="font-semibold text-primary">Rp 50.000</span></div>
-                    <div className="h-px bg-gold/30 my-3"></div>
+                    {/* <div className="h-px bg-gold/30 my-3"></div> */}
                     <div className="flex justify-between items-center"><span className="font-bold text-primary uppercase">Total:</span> <span className="font-display text-2xl font-bold text-gold">Rp {total.toLocaleString('id-ID')}</span></div>
                   </div>
 
@@ -126,19 +123,19 @@ const CheckoutModal = ({ isOpen, onClose, items, setItems }) => {
                     onClick={() => setActiveTab('form')}
                     className="w-full bg-accent-green hover:bg-accent-green-dark text-white font-semibold py-4 rounded-sm tracking-widest transition-all"
                   >
-                    LANJUT KE DATA PENGIRIMAN
+                    LANJUT KE DATA PEMESAN
                   </button>
                 </div>
               ) : (
                 /* Tab 2: Form */
-                <form onSubmit={handleSubmit} className="space-y-4 animate-fade-in">
-                  <h3 className="font-display text-xl font-bold text-primary mb-6 italic">Isi Data Pengiriman</h3>
+                <form onSubmit={handleSubmit} className="space-y-4 text-primary font-bold animate-fade-in">
+                  <h3 className="font-display text-xl font-bold text-primary mb-6">Isi Data Anda</h3>
                   <div>
                     <label className="block text-xs font-bold text-primary mb-2 uppercase tracking-tighter">Nama Lengkap *</label>
                     <input 
                       required 
-                      className="w-full px-4 py-3 border-2 border-gray-200 focus:border-accent-green outline-none" 
-                      placeholder="Masukkan nama sesuai KTP"
+                      className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 focus:border-accent-green outline-none" 
+                      placeholder="Masukkan nama Anda"
                       value={formData.name}
                       onChange={(e) => setFormData({...formData, name: e.target.value})}
                     />
@@ -147,7 +144,7 @@ const CheckoutModal = ({ isOpen, onClose, items, setItems }) => {
                     <label className="block text-xs font-bold text-primary mb-2 uppercase tracking-tighter">Nomor WhatsApp *</label>
                     <input 
                       required type="tel" 
-                      className="w-full px-4 py-3 border-2 border-gray-200 focus:border-accent-green outline-none" 
+                      className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 focus:border-accent-green outline-none" 
                       placeholder="Contoh: 08123456789"
                       value={formData.phone}
                       onChange={(e) => setFormData({...formData, phone: e.target.value})}
@@ -157,21 +154,21 @@ const CheckoutModal = ({ isOpen, onClose, items, setItems }) => {
                     <label className="block text-xs font-bold text-primary mb-2 uppercase tracking-tighter">Alamat Lengkap *</label>
                     <textarea 
                       required rows="3" 
-                      className="w-full px-4 py-3 border-2 border-gray-200 focus:border-accent-green outline-none" 
-                      placeholder="Nama Jalan, RT/RW, Kelurahan, Kecamatan, Kota"
+                      className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 focus:border-accent-green outline-none" 
+                      placeholder="Nama Desa / Kelurahan, Kecamatan, Kota"
                       value={formData.address}
                       onChange={(e) => setFormData({...formData, address: e.target.value})}
                     />
                   </div>
 
                   <div className="flex gap-3 pt-4">
-                    <button type="button" onClick={() => setActiveTab('review')} className="flex-1 border-2 border-primary text-primary font-bold py-4 text-xs tracking-widest">KEMBALI</button>
+                    <button type="button" onClick={() => setActiveTab('review')} className="flex-2 px-8 border-2 border-primary text-primary font-bold py-4 text-xs tracking-widest">KEMBALI</button>
                     <button 
                       type="submit" 
                       disabled={status === 'loading'}
-                      className="flex-2 bg-accent-green hover:bg-accent-green-dark text-white font-bold py-4 px-8 text-xs tracking-[0.2em] transition-all disabled:bg-gray-300"
+                      className="flex-1 bg-accent-green hover:bg-accent-green-dark text-white font-bold py-4 px-8 text-xs tracking-[0.2em] transition-all disabled:bg-gray-300"
                     >
-                      {status === 'loading' ? 'SEDANG MEMPROSES...' : 'SELESAIKAN PESANAN'}
+                      {status === 'loading' ? 'SEDANG MEMPROSES...' : 'KIRIM PESANAN'}
                     </button>
                   </div>
                 </form>

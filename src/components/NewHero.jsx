@@ -18,7 +18,7 @@ const NewHero = ({ banners = [] }) => {
       
       {/* 1. Kontainer Utama: Diubah menjadi Grid/Flex 2 kolom saat layar md */}
       <div className="relative z-2 max-w-7xl mx-auto px-4 md:px-8 w-full">
-        <div className="flex mt-10 md:mt-2 pt-6 flex-col md:flex-row items-center gap-12">
+        <div className="flex mt-6 md:mt-2 pt-6 flex-col md:flex-row items-center gap-12">
           
           {/* KOLOM KIRI: Text & Countdown */}
           <div className="w-full md:w-1/2 text-center md:text-left order-1">
@@ -65,17 +65,17 @@ const NewHero = ({ banners = [] }) => {
               className="pb-12"
             >
               {banners.map((banner, index) => (
-                <SwiperSlide key={index} className="max-w-[200px] sm:max-w-[350px] md:max-w-[400px]">
+                <SwiperSlide key={index} className="max-w-[210px] md:max-w-[320px]">
                   {/* 2. Koreksi Tinggi: Menggunakan aspect-ratio tetap & object-cover agar gambar seragam */}
                   <div 
                     onClick={() => setSelectedImg(banner)}
-                    className="cursor-zoom-in group relative overflow-hidden rounded-2xl md:rounded-3xl shadow-2xl border border-gold/20"
+                    className="cursor-zoom-in group relative overflow-hidden rounded-xl md:rounded-2xl shadow-2xl border border-gold/20"
                   >
                     <img 
                       src={banner} 
-                      alt={banner} 
+                      alt='catalogue'
                       // h-[400px] atau aspect-square memastikan tinggi selalu sama meski file asli beda ukuran
-                      className="w-full h-[300px] md:h-[450px] object-contain transition-transform duration-700 group-hover:scale-105"
+                      className="w-full h-[300px] md:h-[450px] object-cover transition-transform duration-700 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                       <span className="text-white bg-gold/80 px-4 py-2 rounded-full text-xs font-semibold backdrop-blur-sm">View Poster</span>
