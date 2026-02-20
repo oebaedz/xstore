@@ -15,6 +15,7 @@ import ProductSale from "./pages/ProductSale";
 import ProductFormPage from "./pages/ProductFormPage";
 import { ToastProvider } from "./context/ToastContext";
 import Nyoba from "./components/newcomps/Nyoba";
+import SuccessPage from "./pages/SuccsessPage";
 
 function App() {
   const itemsFromLocalStorage = JSON.parse(localStorage.getItem('cart')) || []
@@ -60,6 +61,7 @@ function App() {
               <Route path="*" element={<Navigate to="/" />} />
             </Route>
 
+            <Route path="/success" element={<SuccessPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/v2" element={<Nyoba />} />
 

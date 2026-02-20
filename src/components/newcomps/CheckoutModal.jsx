@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import supabase from '../createClient';
 
 const CheckoutModal = ({ isOpen, onClose, items, setItems }) => {
   const [activeTab, setActiveTab] = useState('review'); // 'review' | 'form'
   const [status, setStatus] = useState('idle'); // 'idle' | 'loading' | 'success'
   const [formData, setFormData] = useState({ name: '', phone: '', address: '' });
+  const navigate = useNavigate();
 
   if (!isOpen) return null;
 
@@ -14,50 +17,55 @@ const CheckoutModal = ({ isOpen, onClose, items, setItems }) => {
     setStatus('loading');
 
     // Persiapkan data sesuai format script (items_json)
-    const orderData = {
-      order_id: 'ORD-' + Date.now(),
-      customer_name: formData.name,
-      customer_phone: formData.phone,
-      customer_address: formData.address,
-      items_json: JSON.stringify(items.map(item => ({
-        name: item.name,
-        variants: item.variantInfo,
-        quantity: item.qty,
-        price: item.price
-      }))),
-      total_price: total,
-      order_status: 'Pending',
-      created_at: new Date().toISOString()
-    };
+    const orderForm = {
+      nama: formData.name,
+      no_hp: formData.phone,
+      alamat: formData.address,
+      total_harga: total,
+      status: 'belum',
+      dibayar: 0,
+    }
 
     try {
-      if (window.dataSdk) {
-        const result = await window.dataSdk.create(orderData);
-        if (result.isOk) {
-          handleSuccess();
-        } else {
-          alert('Gagal: ' + result.error);
-          setStatus('idle');
-        }
-      } else {
-        // Fallback Success for Testing
-        setTimeout(handleSuccess, 1500);
+      const { data: orderData, error: orderError } = await supabase
+        .from('orders')
+        .insert(orderForm)
+        .select()
+
+      if (orderError) {
+        setStatus('idle');
+        return "Gagal membuat pesanan: " + orderError.message;
       }
+
+      const orderId = orderData[0].id;
+
+      const itemsToInsert = items.map(item => ({
+        order_id: orderId,
+        product_id: item.product_id,
+        variant_id: item.variant_id,
+        price: item.price,
+        qty: item.qty,
+        subtotal: item.qty * item.price,
+      }));
+      
+      const { error: itemsError } = await supabase
+        .from('order_items')
+        .insert(itemsToInsert);
+
+      if (itemsError) {
+        setStatus('idle');
+        return "Gagal menyimpan item pesanan: " + itemsError.message;
+      }
+      setItems([]);
+      onClose();
+      setStatus('idle');
+      setFormData({ name: '', phone: '', address: '' })
+
+      navigate('/success', { state: { order: orderData[0], items } });
     } catch (error) {
       console.error(error);
       setStatus('idle');
     }
-  };
-
-  const handleSuccess = () => {
-    setStatus('success');
-    setTimeout(() => {
-      setItems([]);
-      onClose();
-      setActiveTab('review');
-      setStatus('idle');
-      setFormData({ name: '', phone: '', address: '' });
-    }, 2500);
   };
 
   return (
