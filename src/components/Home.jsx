@@ -5,6 +5,7 @@ import NewHero from "./NewHero";
 import ProductCard from "./newcomps/ProductCard";
 import CartSidebar from "./newcomps/CartSidebar";
 import CheckoutModal from "./newcomps/CheckoutModal";
+import pic from "../assets/catalog.jpg";
 
 const Home = () => {
   const { items, setItems, isCartOpen, setIsCartOpen } = useContext(StoreContext);
@@ -25,6 +26,12 @@ const Home = () => {
   useEffect(() => {
     fetchAdminData();
   }, []);
+
+  const banners = [
+    pic,
+    "https://kaos-halalbihalal10.vercel.app/assets/Cat-3R5N9Oct.jpeg",
+    pic,
+  ];
   
   return (
     <>{loading ? (
@@ -34,9 +41,7 @@ const Home = () => {
     ) : (
       <div className="min-h-screen">
         <div className="flex flex-col h-[100svh] md:h-auto overflow-hidden">
-          <NewHero />
-          {/* <Countdown /> */}
-          {/* <Hero /> */}
+          <NewHero banners={banners} />
         </div>
 
         <section className="py-24 bg-gradient-to-b from-white to-gray-50">

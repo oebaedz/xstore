@@ -1,11 +1,30 @@
-import React from "react";
+import { useEffect, useState } from "react";
 
 export default function Countdown() {
+  const closingDate = new Date("2026-02-21T23:59:59");
+  const [timeLeft, setTimeLeft] = useState(closingDate - new Date().getTime());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const now = new Date().getTime();
+      const timeDiff = closingDate - now;
+      setTimeLeft(timeDiff);
+      if (timeDiff <= 0) {
+        clearInterval(timer);
+        setTimeLeft(0);
+      } else {
+        setTimeLeft(timeDiff);
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [closingDate]);
+  
   const items = [
-    { label: "HARI", value: "12" },
-    { label: "JAM", value: "08" },
-    { label: "MENIT", value: "45" },
-    { label: "DETIK", value: "21" },
+    { label: "HARI", value: Math.floor(timeLeft / (1000 * 60 * 60 * 24)).toString().padStart(2, "0") },
+    { label: "JAM", value: Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, "0") },
+    { label: "MENIT", value: Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, "0") },
+    { label: "DETIK", value: Math.floor((timeLeft % (1000 * 60)) / 1000).toString().padStart(2, "0") },
   ];
 
   return (

@@ -1,111 +1,116 @@
-import Countdown from "./newcomps/Countdown";
+import React, { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, Pagination, Navigation } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/pagination";
-import "swiper/css/effect-coverflow";
-import { Link } from "react-router-dom";
-import pic from "../assets/catalog.jpg";
+import { Autoplay, Pagination, EffectCoverflow } from "swiper/modules";
+import Countdown from "./newcomps/Countdown";
 
-const NewHero = () => {
-  const banners = [
-    pic,
-    pic,
-    pic,
-  ];
+import 'swiper/css';
+import 'swiper/css/pagination';
+import 'swiper/css/effect-coverflow';
+
+const NewHero = ({ banners = [] }) => {
+  const [selectedImg, setSelectedImg] = useState(null);
+
+  if (!banners || banners.length === 0) return null;
 
   return (
-    <section className="relative flex-1 flex flex-col justify-center bg-gradient-to-b from-primary via-[#075a45] to-[#086b52] py-24 overflow-hidden">
-      {/* Background Decor */}
-      <div className="arabesque-pattern absolute inset-0 opacity-30"></div>
+    <section className="relative min-h-screen flex flex-col justify-center bg-gradient-to-b from-primary via-[#075a45] to-[#086b52] py-16 md:py-24 overflow-hidden">
+      <div className="arabesque-pattern absolute inset-0 opacity-20"></div>
       
-      {/* Floating Ornaments (Kiri & Kanan) */}
-      <div className="absolute top-10 left-10 w-20 h-20 opacity-20 animate-float">
-        <svg viewBox="0 0 100 100" className="w-full h-full">
-          <polygon points="50,5 61,40 98,40 68,62 79,97 50,75 21,97 32,62 2,40 39,40" fill="none" stroke="#EBD197" strokeWidth="1" />
-        </svg>
-      </div>
-      <div className="absolute bottom-20 right-10 w-16 h-16 opacity-20 animate-float animation-delay-500">
-        <svg viewBox="0 0 100 100" className="w-full h-full">
-          <polygon points="50,5 61,40 98,40 68,62 79,97 50,75 21,97 32,62 2,40 39,40" fill="none" stroke="#EBD197" strokeWidth="1" />
-        </svg>
-      </div>
+      {/* 1. Kontainer Utama: Diubah menjadi Grid/Flex 2 kolom saat layar md */}
+      <div className="relative z-2 max-w-7xl mx-auto px-4 md:px-8 w-full">
+        <div className="flex mt-10 md:mt-2 pt-6 flex-col md:flex-row items-center gap-12">
+          
+          {/* KOLOM KIRI: Text & Countdown */}
+          <div className="w-full md:w-1/2 text-center md:text-left order-1">
+            <div className="mb-6 hidden md:block animate-fade-in">
+              <img 
+                src="https://i.postimg.cc/Y0ZKD30p/LOGO-NAMA-IKSADA-NEW.png" 
+                alt="logo" 
+                className="h-12 animate-float" 
+              />
+            </div>
 
-      <div className="relative z-1 max-w-5xl mx-auto px-4 text-center">
-        {/* Main Logo */}
-        <div className="mb-8 hidden md:block animate-fade-in">
-          <div className="w-16 h-16 md:w-32 md:h-32 mx-auto mb-6 animate-float">
-            <img src="https://i.postimg.cc/Y0ZKD30p/LOGO-NAMA-IKSADA-NEW.png" alt="logo" className="h-12 md:h-20 mx-auto animate-float" />
+            <h1 className="font-display text-3xl md:text-5xl lg:text-6xl font-bold mb-4 animate-shimmer bg-gradient-to-r from-gold via-white to-gold bg-[length:200%_auto] bg-clip-text text-transparent">
+              Koleksi Eksklusif IKSADA
+            </h1>
+            
+            <p className="text-white/80 text-sm md:text-lg mb-8 max-w-2xl font-body font-light">
+              Merchandise premium dengan sentuhan seni arsitektur Islam yang megah.
+            </p>
+
+            {/* Countdown sekarang diletakkan di bawah text agar layout seimbang */}
+            <div className="mt-10">
+              <Countdown />
+            </div>
+          </div>
+
+          {/* KOLOM KANAN: Carousel */}
+          <div className="w-full md:w-1/2 order-2">
+            <Swiper
+              modules={[Autoplay, Pagination, EffectCoverflow]}
+              effect={'coverflow'}
+              grabCursor={true}
+              centeredSlides={true}
+              slidesPerView={'auto'}
+              loop={true}
+              coverflowEffect={{
+                rotate: 5,
+                stretch: 0,
+                depth: 100,
+                modifier: 2,
+                slideShadows: false,
+              }}
+              autoplay={{ delay: 4000 }}
+              pagination={{ clickable: true, dynamicBullets: true }}
+              className="pb-12"
+            >
+              {banners.map((banner, index) => (
+                <SwiperSlide key={index} className="max-w-[200px] sm:max-w-[350px] md:max-w-[400px]">
+                  {/* 2. Koreksi Tinggi: Menggunakan aspect-ratio tetap & object-cover agar gambar seragam */}
+                  <div 
+                    onClick={() => setSelectedImg(banner)}
+                    className="cursor-zoom-in group relative overflow-hidden rounded-2xl md:rounded-3xl shadow-2xl border border-gold/20"
+                  >
+                    <img 
+                      src={banner} 
+                      alt={banner} 
+                      // h-[400px] atau aspect-square memastikan tinggi selalu sama meski file asli beda ukuran
+                      className="w-full h-[300px] md:h-[450px] object-contain transition-transform duration-700 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <span className="text-white bg-gold/80 px-4 py-2 rounded-full text-xs font-semibold backdrop-blur-sm">View Poster</span>
+                    </div>
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
           </div>
         </div>
-
-        {/* Text Content */}
-        <h1 className="font-display mt-16 text-2xl md:text-6xl font-bold mb-4 animate-shimmer bg-gradient-to-r from-gold via-white to-gold bg-[length:200%_auto] bg-clip-text text-transparent">
-          Koleksi Eksklusif IKSADA
-        </h1>
-        
-        <p className="text-white/80 text-sm md:text-xl mb-8 max-w-2xl mx-auto font-body font-light">
-          Merchandise premium dengan sentuhan seni kaligrafi dan desain arsitektur Islam yang megah.
-        </p>
-
-        {/* Decorative Divider */}
-        <div className="flex items-center justify-center gap-4 mb-8 opacity-70">
-          <div className="w-24 h-px bg-gradient-to-r from-transparent via-gold to-transparent"></div>
-          <svg className="w-6 h-6 text-gold" viewBox="0 0 24 24" fill="currentColor">
-            <polygon points="12,2 15,9 22,9 16,14 18,22 12,17 6,22 8,14 2,9 9,9" />
-          </svg>
-          <div className="w-24 h-px bg-gradient-to-r from-transparent via-gold to-transparent"></div>
-        </div>
-
-        {/* Floating Carousel Section */}
-        <div className="relative w-full max-w-2xl mx-auto mb-8 lg:hidden">
-          <Swiper
-            modules={[Autoplay, Pagination, Navigation]}
-            effect={"coverflow"}
-            grabCursor={true}
-            centeredSlides={true}
-            slidesPerView={"auto"}
-            coverflowEffect={{
-              rotate: 0,
-              stretch: 0,
-              depth: 100,
-              modifier: 2.5,
-              slideShadows: false,
-            }}
-            autoplay={{
-              delay: 4000,
-              disableOnInteraction: true,
-            }}
-            pagination={{
-              clickable: true,
-              dynamicBullets: true,
-            }}
-            breakpoints={{
-              320: { spaceBetween: 20 },
-              768: { slidesPerView: 2, spaceBetween: 30 },
-              1024: { slidesPerView: 2.5, spaceBetween: 40 },
-            }}
-            className="pb-12"
-          >
-            {banners.map((banner, index) => (
-              <SwiperSlide key={index} className="max-w-[200px] md:max-w-[500px] text-gold space-x-4">
-                <Link 
-                  to={'/'} 
-                  className="block group relative overflow-hidden rounded-2xl md:rounded-3xl border border-gold/90">
-                    <img src={banner} alt={`Banner ${index + 1}`} className="w-full object-contain rounded-xl shadow-lg transition-transform group-hover:scale-110" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                </Link>
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </div>
-
-        {/* CTA Button */}
-        {/* <button className="bg-action text-xs hover:bg-green-700 text-white font-semibold px-10 py-4 rounded-sm tracking-widest transition-all duration-300 shadow-[0_0_20px_rgba(235,209,151,0.3)] hover:shadow-accent/40 active:scale-95 uppercase">
-          Lihat Koleksi Eksklusif
-        </button> */}
-        <Countdown />
       </div>
+
+      {/* --- MODAL LIGHTBOX --- */}
+      {selectedImg && (
+        <div 
+          className="fixed inset-0 z-[999] flex items-center justify-center bg-black/95 backdrop-blur-md p-4"
+          onClick={() => setSelectedImg(null)}
+        >
+          <img 
+            src={selectedImg} 
+            alt="Preview" 
+            className="max-w-full max-h-[90vh] rounded-lg shadow-2xl animate-zoom-in"
+          />
+        </div>
+      )}
+
+      {/* 3. Koreksi Lain: Pindahkan style ke tag standar tanpa atribut 'global' untuk Vite */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        .swiper-pagination-bullet { background: #EBD197 !important; }
+        .animate-zoom-in { animation: zoomIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        @keyframes zoomIn {
+          from { transform: scale(0.9); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
+        }
+      `}} />
     </section>
   );
 };

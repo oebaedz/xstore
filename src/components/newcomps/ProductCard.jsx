@@ -54,13 +54,13 @@ export default function ProductCard( { product, setIsCartOpen } ) {
       "
     >
       {/* Media */}
-      <div className="h-40 md:h-80 bg-muted relative">
+      <div className="h-40 md:h-80 bg-muted bg-gradient-to-br to-[#064E3B] from-[#043027] p-4 relative">
         {/* Badge */}
         <span
           className="
             absolute top-2 left-2 md:top-4 md:left-4
-            bg-primary text-primary-foreground
-            text-[6px] md:text-sm tracking-widest
+            bg-gold text-primary font-bold
+            text-[10px] md:text-sm tracking-widest
             px-2 md:px-3 py-1
             rounded-sm
             font-body
@@ -78,7 +78,7 @@ export default function ProductCard( { product, setIsCartOpen } ) {
       {/* Content */}
       <div className="p-3 md:p-6 flex flex-col md:gap-4">
         {/* Title */}
-        <h3 className="font-display mb-2 text-md md:text-2xl text-primary">
+        <h3 className="font-display font-bold mb-2 text-md md:text-2xl text-primary">
           {product.name}
         </h3>
 
@@ -93,7 +93,7 @@ export default function ProductCard( { product, setIsCartOpen } ) {
             <label
               key={v.id}
               className={`
-                px-1 md:px-3 md:py-1
+                px-2 md:px-3 md:py-1
                 text-[10px] md:text-xs
                 rounded-sm
                 font-body
@@ -118,7 +118,7 @@ export default function ProductCard( { product, setIsCartOpen } ) {
         </div>
 
         {/* Price */}
-        <div className="font-display text-2xl md:text-3xl text-gold mt-2">
+        <div className="font-display text-2xl md:text-3xl font-bold text-gold mt-2">
           Rp {Number(selectedVariantDetails?.price).toLocaleString()}
         </div>
 
