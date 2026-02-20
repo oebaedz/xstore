@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useMemo } from "react";
 import { StoreContext } from "../StoreContext";
 import supabase from "./createClient";
 import NewHero from "./NewHero";
@@ -12,6 +12,7 @@ const Home = () => {
   const [dataProducts, setDataProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [filterStatus, setFilterStatus] = useState('Semua');
   const fetchAdminData = async () => {
       setLoading(true);
       // Kita ambil data secara paralel agar cepat
@@ -32,7 +33,19 @@ const Home = () => {
     "https://kaos-halalbihalal10.vercel.app/assets/Cat-3R5N9Oct.jpeg",
     pic,
   ];
+
+  const categories = useMemo(() => {
+    const cats = new Set(dataProducts.map(p => p.category));
+    return ['Semua', ...cats];
+  }, [dataProducts]);
   
+  const filteredProducts = useMemo(() => {
+    if (filterStatus === 'Semua') return dataProducts; // Tampilkan semua produk jika filter 'semua' dipilih
+    return dataProducts.filter((product) => 
+      product.category.toLowerCase() === filterStatus.toLowerCase()
+    );
+  }, [dataProducts, filterStatus]);
+
   return (
     <>{loading ? (
       <div className="flex items-center bg-primary justify-center h-screen">
@@ -59,8 +72,26 @@ const Home = () => {
               </div>
             </div>
 
+            {/* Horizontal Filter */}
+            <div className="flex mb-4 gap-2 md:gap-4 overflow-x-auto pb-4 no-scrollbar">
+              {categories.map((f) => (
+                <button
+                  key={f}
+                  onClick={() => setFilterStatus(f)}
+                  className={`px-5 md:px-8 py-2 transition-all duration-300 ease-out rounded-full text-xs md:text-lg tracking-wider font-semibold whitespace-nowrap capitalize transition-all duration-300 border ${
+                    filterStatus === f
+                      ? 'bg-gradient-to-r ml-1 from-emerald-600 to-green-500 text-white shadow-lg scale-105 border-transparent'
+                      : 'bg-white text-slate-600 border-slate-200 hover:border-emerald-400 hover:text-emerald-600'
+                  }`}
+                  
+                >
+                  {f}
+                </button>
+              ))}
+            </div>
+
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-10">
-              {dataProducts.map((data) => {
+              {filteredProducts.map((data) => {
                 return (
                   <div key={data.id}>
                     {/* <GroupedCard productGroup={productGroup} /> */}

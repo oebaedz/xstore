@@ -296,17 +296,19 @@ const OrdererInfo = () => {
                 </span>
               )}
             </div>
-            <input
-              type="text"
-              placeholder="Masukkan nomor HP (contoh: 6281234567890)"
-              className={`input input-bordered w-full ${noHP.match(/^62\d{8,}$/) ? 'input-success' : (noHP.trim() ? 'input-error' : '')} dark:bg-gray-700 dark:text-white dark:border-gray-600`}
-              onChange={(e) => setNoHP(e.target.value)}
-              value={noHP}
-              name="noHP"
-            />
-            <p className="font-light text-sm ml-1 pt-2">
-              No. HP diawali dengan angka 62
-            </p>
+            <div className="flex w-full">
+              {/* <span className="flex items-center px-3 border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 rounded-l-md text-sm">
+                +62
+              </span> */}
+              <input
+                type="text"
+                placeholder="812xxxxxx"
+                className={`input input-bordered rounded-1-none w-full ${noHP.match(/^62\d{8,}$/) ? 'input-success' : (noHP.trim() ? 'input-error' : '')} dark:bg-gray-700 dark:text-white dark:border-gray-600`}
+                onChange={(e) => setNoHP(e.target.value)}
+                value={noHP}
+                name="noHP"
+              />
+            </div>
           </label>
           <label className="form-control w-full">
             <div className="label flex flex-row justify-between">
