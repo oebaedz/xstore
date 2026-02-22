@@ -17,7 +17,7 @@ const Home = () => {
       setLoading(true);
       // Kita ambil data secara paralel agar cepat
       const [prodRes] = await Promise.all([
-        supabase.from('products').select('*').order('name', { ascending: false }),
+        supabase.from('products').select('*').order('category', { ascending: true }),
       ]);
   
       setDataProducts(prodRes.data || []);

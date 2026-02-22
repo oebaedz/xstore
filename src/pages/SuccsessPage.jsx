@@ -1,10 +1,19 @@
 import { ArrowLeft } from 'lucide-react';
+import { useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 
 const SuccessPage = () => {
   const location = useLocation();
   const order = location.state?.order;
   const items = location.state?.items || [];
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'instant',
+    });
+  }, []);
 
   if (!order) return <div className="min-h-[100vh] text-center py-20">Pesanan tidak ditemukan.</div>;
 

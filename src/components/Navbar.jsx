@@ -25,7 +25,8 @@ const Navbar = () => {
         ? 'bg-primary/95 backdrop-blur-md shadow-lg border-b border-gold' 
         : 'bg-transparent'
       }`}>
-      <div className="max-w-7xl mx-auto px-4 flex justify-between items-center">
+      <div className="max-w-7xl relative mx-auto px-4 flex justify-between items-center">
+        <div className={`arabesque-pattern absolute inset-0 opacity-80 ${isScrolled ? 'block' : 'hidden'}`}></div>
         <div className="flex items-center space-x-4">
           <Link
             to="/"
