@@ -54,8 +54,9 @@ export default function ProductCard( { product, setIsCartOpen } ) {
       "
     >
       {/* Media */}
-      <div className="h-40 md:h-80 bg-muted bg-gradient-to-br to-[#064E3B] from-[#043027] p-4 relative">
+      <div className="relative h-40 md:h-80 bg-muted bg-gradient-to-br to-[#064E3B] from-[#043027] p-4 relative">
         {/* Badge */}
+        <div className="arabesque-pattern absolute inset-0 opacity-80"></div>
         <span
           className="
             absolute top-2 left-2 md:top-4 md:left-4

@@ -1,5 +1,4 @@
 import { useContext, useEffect, useState } from "react";
-import CartBody from "./CartBody";
 import { StoreContext } from "../StoreContext";
 import { Link } from "react-router-dom";
 
@@ -33,7 +32,7 @@ const Navbar = () => {
             className="btn btn-ghost text-xl"
             onClick={() => window.scrollTo(0, 0)}
           >
-            <img src="https://i.postimg.cc/Y0ZKD30p/LOGO-NAMA-IKSADA-NEW.png" alt="logo" className="w-6" />
+            <img src="./public/Logo.webp" alt="logo" className="w-6" />
             <h1 className="text-2xl font-display text-gold">IKSADA STORE</h1>
           </Link>
         </div>

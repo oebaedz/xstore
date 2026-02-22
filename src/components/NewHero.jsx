@@ -14,11 +14,11 @@ const NewHero = ({ banners = [] }) => {
 
   return (
     <section className="relative min-h-screen flex flex-col justify-center bg-gradient-to-b from-primary via-[#075a45] to-[#086b52] py-16 md:py-24 overflow-hidden">
-      <div className="arabesque-pattern absolute inset-0 opacity-20"></div>
+      <div className="arabesque-pattern absolute inset-0 opacity-80"></div>
       
       {/* 1. Kontainer Utama: Diubah menjadi Grid/Flex 2 kolom saat layar md */}
       <div className="relative z-2 max-w-7xl mx-auto px-4 md:px-8 w-full">
-        <div className="flex mt-6 md:mt-2 pt-6 flex-col md:flex-row items-center gap-12">
+        <div className="flex mt-6 md:mt-2 flex-col md:flex-row items-center gap-12">
           
           {/* KOLOM KIRI: Text & Countdown */}
           <div className="w-full md:w-1/2 text-center md:text-left order-1">

@@ -34,8 +34,8 @@ const CartSidebar = ({ isOpen, onClose, items, setItems, onCheckout }) => {
       }`}>
         
         {/* Header: Deep Emerald with Pattern */}
-        <div className="relative bg-primary px-8 py-4 border-b border-gold text-white overflow-hidden">
-          <div className="arabesque-pattern absolute inset-0 opacity-20"></div>
+        <div className="relative sticky top-0 bg-primary px-8 py-4 border-b-2 border-gold text-white overflow-hidden">
+          <div className="arabesque-pattern absolute inset-0 opacity-80"></div>
           <div className="relative z-10 flex items-center justify-between">
             <div>
               <h2 className="font-display text-3xl font-bold text-gold">Keranjang</h2>
@@ -53,7 +53,7 @@ const CartSidebar = ({ isOpen, onClose, items, setItems, onCheckout }) => {
         </div>
 
         {/* Content Section */}
-        <div className="flex flex-col h-[calc(100vh-150px)]">
+        <div className="flex flex-col h-[calc(100vh-200px)]">
           <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-2 md:space-y-6 custom-scrollbar">
             {items.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-center space-y-4">
@@ -114,7 +114,7 @@ const CartSidebar = ({ isOpen, onClose, items, setItems, onCheckout }) => {
                         </button>
                         </div>
                           <div className="text-left">
-                            <p className="text-primary font-body font-bold text:sm md:text-lg">
+                            <p className="text-primary font-body font-bold text:xs md:text-lg">
                               Rp {(item.price * item.qty).toLocaleString('id-ID')}
                             </p>
                           </div>
@@ -126,7 +126,7 @@ const CartSidebar = ({ isOpen, onClose, items, setItems, onCheckout }) => {
           </div>
 
           {/* Sticky Footer Area */}
-          <div className="p-8 py-2 bg-gray-50 border-t border-gray-200">
+          <div className="p-8 py-2 bg-gray-50 border-t pb-10 border-gray-200">
             <div className="mt-1 md:mt-2 mb-4">
               <div className="flex justify-between items-center">
                 <span className="font-body text-lg md:text-xl font-bold text-primary uppercase">Total</span>
