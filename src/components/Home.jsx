@@ -47,11 +47,7 @@ const Home = () => {
   }, [dataProducts, filterStatus]);
 
   return (
-    <>{loading ? (
-      <div className="flex items-center bg-primary justify-center h-screen">
-        <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-16 w-16"></div>
-      </div>
-    ) : (
+    <>
       <div className="min-h-screen">
         <div className="flex flex-col h-[100svh] md:h-auto overflow-hidden">
           <NewHero banners={banners} />
@@ -94,7 +90,6 @@ const Home = () => {
               {filteredProducts.map((data) => {
                 return (
                   <div key={data.id}>
-                    {/* <GroupedCard productGroup={productGroup} /> */}
                     <ProductCard product={data} setIsCartOpen={setIsCartOpen} />
                   </div>
                 );
@@ -119,7 +114,6 @@ const Home = () => {
         />
 
       </div>
-    )}
     </>
   );
 };

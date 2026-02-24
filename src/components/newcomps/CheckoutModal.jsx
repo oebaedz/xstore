@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import supabase from '../createClient';
+import sendWhatsApp from '../../context/sendWhatsApp';
 
 const CheckoutModal = ({ isOpen, onClose, items, setItems }) => {
   const [activeTab, setActiveTab] = useState('review'); // 'review' | 'form'
@@ -25,6 +26,8 @@ const CheckoutModal = ({ isOpen, onClose, items, setItems }) => {
       status: 'belum',
       dibayar: 0,
     }
+
+    const message = `Terima kasih, pesanan Anda telah kami terima dengan rincian sebagai berikut:\n\nNama: *${formData.name}*\nNo. HP: *${formData.phone}*\nAlamat: *${formData.address}*\nOrderan:\n${items.map(item => `- ${item.name} x ${item.qty} = Rp ${item.price * item.qty}`).join('\n')}\nTotal Harga: *Rp ${total.toLocaleString("id-ID")}*\n\nMohon lakukan pembayaran DP minimal 50% ke rekening berikut:\nBRI a/n: A. JAMIL HIDAYATULLAH\nNo. Rekening: 0582-0102-0919-50-4\n\nSetelah melakukan pembayaran, silakan konfirmasi melalui WhatsApp di 6282228326870\n\nTerima kasih atas kepercayaan Anda kepada kami!`;
 
     try {
       const { data: orderData, error: orderError } = await supabase
@@ -56,10 +59,14 @@ const CheckoutModal = ({ isOpen, onClose, items, setItems }) => {
         setStatus('idle');
         return "Gagal menyimpan item pesanan: " + itemsError.message;
       }
+      sendWhatsApp(formData.phone, message);
+      console.log("Pesan WhatsApp terkirim:", message);
+
       setItems([]);
       onClose();
       setStatus('idle');
       setFormData({ name: '', phone: '', address: '' })
+      console.log("Data order yang disimpan:", { ...orderForm, items: itemsToInsert });
 
       navigate('/success', { state: { order: orderData[0], items } });
     } catch (error) {
@@ -136,33 +143,66 @@ const CheckoutModal = ({ isOpen, onClose, items, setItems }) => {
                 </div>
               ) : (
                 /* Tab 2: Form */
-                <form onSubmit={handleSubmit} className="space-y-4 text-primary font-bold animate-fade-in">
+                <form onSubmit={handleSubmit} className="space-y-4 text-primary animate-fade-in">
                   <h3 className="font-display text-xl font-bold text-primary mb-6">Isi Data Anda</h3>
                   <div>
-                    <label className="block text-xs font-bold text-primary mb-2 uppercase tracking-tighter">Nama Lengkap *</label>
+                    <div className="label flex flex-row justify-between">
+                      <label className="block text-xs font-bold text-primary mb-2 uppercase tracking-tighter">Nama Lengkap *</label>
+                      {formData.name.trim() && (
+                        <span className="text-xs text-green-600 flex items-center dark:text-green-400">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                          Terisi
+                        </span>
+                      )}
+                    </div>
                     <input 
                       required 
-                      className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 focus:border-accent-green outline-none" 
+                      className={`w-full px-4 py-3 bg-gray-50 outline-none ${formData.name.trim() ? 'input-success' : ''}`}
                       placeholder="Masukkan nama Anda"
                       value={formData.name}
                       onChange={(e) => setFormData({...formData, name: e.target.value})}
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-primary mb-2 uppercase tracking-tighter">Nomor WhatsApp *</label>
+                    <div className='label flex flex-row justify-between items-center'>
+                      <label className="block text-xs font-bold text-primary mb-2 uppercase tracking-tighter">Nomor WhatsApp *</label>
+                      {formData.phone.trim() && (
+                        <span className={`text-xs ${formData.phone.match(/^(08|62)\d{8,}$/) ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'} flex items-center`}>
+                          <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 mr-1 ${formData.phone.match(/^(08|62)\d{8,}$/) ? 'block' : 'hidden'}`} viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                          <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 mr-1 ${!formData.phone.match(/^(08|62)\d{8,}$/) ? 'block' : 'hidden'}`} viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                          </svg>
+                          {formData.phone.match(/^(08|62)\d{8,}$/) ? 'Valid' : 'Masukkan nomor yang valid'}
+                        </span>
+                      )}
+                    </div>
                     <input 
                       required type="tel" 
-                      className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 focus:border-accent-green outline-none" 
+                      className={`w-full px-4 py-3 bg-gray-50  outline-none ${formData.phone.match(/^(08|62)\d{8,}$/) ? 'input-success' : (formData.phone.trim() ? 'input-error' : '')}`}
                       placeholder="Contoh: 08123456789"
                       value={formData.phone}
                       onChange={(e) => setFormData({...formData, phone: e.target.value})}
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-primary mb-2 uppercase tracking-tighter">Alamat Lengkap *</label>
+                    <div className="label flex flex-row justify-between">
+                      <label className="block text-xs font-bold text-primary mb-2 uppercase tracking-tighter">Alamat Lengkap *</label>
+                      {formData.address.trim() && (
+                        <span className="text-xs text-green-600 flex items-center dark:text-green-400">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                          Terisi
+                        </span>
+                      )}
+                    </div>
                     <textarea 
                       required rows="3" 
-                      className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 focus:border-accent-green outline-none" 
+                      className={`w-full px-4 py-3 bg-gray-50  outline-none ${formData.address.trim() ? 'input-success' : ''}`} 
                       placeholder="Nama Desa / Kelurahan, Kecamatan, Kota"
                       value={formData.address}
                       onChange={(e) => setFormData({...formData, address: e.target.value})}

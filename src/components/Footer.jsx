@@ -3,7 +3,7 @@ const Footer = () => {
     <footer className="py-8 gap-1 flex flex-col items-center bg-primary">
       <div>
         <div className="w-20 mb-2">
-          <img src="./public/Logo.webp" alt="logo" className="w-full object-contain" />
+          <img src="/Logo.webp" alt="logo" className="w-full object-contain" />
         </div>
       </div>
       <p className="text-white">Created by <a className='hover:text-yellow' href="https://instagram.com/oebaedz">Zbad</a>, IKSADA Creative Team</p>

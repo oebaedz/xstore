@@ -14,7 +14,6 @@ import RegLayout from "./components/layout/RegLayout";
 import ProductSale from "./pages/ProductSale";
 import ProductFormPage from "./pages/ProductFormPage";
 import { ToastProvider } from "./context/ToastContext";
-import Nyoba from "./components/newcomps/Nyoba";
 import SuccessPage from "./pages/SuccsessPage";
 
 function App() {
@@ -63,7 +62,6 @@ function App() {
 
             <Route path="/success" element={<SuccessPage />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/v2" element={<Nyoba />} />
 
             <Route element={
                 <ProtectedRoute>

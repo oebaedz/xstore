@@ -33,8 +33,11 @@ const Navbar = () => {
             className="btn btn-ghost text-xl"
             onClick={() => window.scrollTo(0, 0)}
           >
-            <img src="./public/Logo.webp" alt="logo" className="w-6" />
-            <h1 className="text-2xl font-display text-gold">IKSADA STORE</h1>
+            <img src="/Logo.webp" alt="logo" className="w-10 mt-1 mr-2" />
+            <div className="flex flex-col">
+              <h1 className="text-2xl font-display text-gold text-left tracking-wider">IKSADA STORE</h1>
+              <p className="text-xs text-left uppercase font-light text-gold/50 tracking-[1px]">Reuni & Halal Bihalal ke-11</p>
+            </div>
           </Link>
         </div>
         <div className="flex items-center space-x-2">
