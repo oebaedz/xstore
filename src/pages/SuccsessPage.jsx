@@ -65,7 +65,7 @@ const SuccessPage = () => {
               <h4 className="font-bold text-primary uppercase w-full text-center text-sm">Instruksi Pembayaran Penting</h4>
               <ul className="text-xs text-gray-700 space-y-2 list-disc pl-4">
                 <li>Harap melakukan <strong>DP minimal 50%</strong> atau <strong>Pelunasan</strong> untuk mengamankan slot produksi.</li>
-                <li>Pembayaran via transfer bank ke nomor rekening <strong>BRI: 12345678901213131</strong> an. <strong>A. Jamil Hidayat</strong></li>
+                <li>Pembayaran via transfer bank ke nomor rekening <strong>BRI: 058201020919504</strong> an. <strong>A. Jamil Hidayatullah</strong></li>
                 <li>Kirim bukti transfer melalui WhatsApp Admin.</li>
               </ul>
             </div>
@@ -80,7 +80,7 @@ const SuccessPage = () => {
               <ArrowLeft className="inline mr-2" size={12} /> BERANDA
             </Link>
             <a 
-              href={`https://wa.me/62812345678?text=Konfirmasi%20Pesanan%20${order.order_id}`}
+              href={`https://wa.me/6282228326870?text=Konfirmasi%20Pesanan%20${order.nama}%20-%20Total%20Rp%20${order.total_harga.toLocaleString('id-ID')}`}
               className="w-full bg-accent-green text-white text-center py-4 font-bold tracking-[0.2em] hover:bg-accent-green-dark transition-all text-xs md:text-sm flex-1"
             >
               BUKA WHATSAPP

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import supabase from '../createClient';
 import sendWhatsApp from '../../context/sendWhatsApp';
+import { CheckCircleIcon } from 'lucide-react';
 
 const CheckoutModal = ({ isOpen, onClose, items, setItems }) => {
   const [activeTab, setActiveTab] = useState('review'); // 'review' | 'form'
@@ -12,6 +13,40 @@ const CheckoutModal = ({ isOpen, onClose, items, setItems }) => {
   if (!isOpen) return null;
 
   const total = items.reduce((acc, item) => acc + (item.price * item.qty), 0);
+
+  const getPhoneStatus = (number) => {
+    if (!number) return { message: '', color: '', valid: false };
+    
+    const cleanNumber = number.trim();
+    
+    if (!/^\d+$/.test(cleanNumber)) {
+      return { message: 'Hanya boleh angka saja', color: 'text-red-500', valid: false };
+    }
+    if (!(cleanNumber.startsWith('08') || cleanNumber.startsWith('62'))) {
+      return { message: 'Gunakan format 08... atau 62...', color: 'text-red-500', valid: false };
+    }
+    if (cleanNumber.length < 10) {
+      return { message: 'Min. 10 digit', color: 'text-amber-500', valid: false };
+    }
+    
+    return { message: 'Nomor sudah benar', color: 'text-green-600', valid: true };
+  };
+  const getNameStatus = (name) => {
+    if (!name.trim()) return { message: '', color: '', valid: false };
+    if (name.trim().length < 3) return { message: 'Minimal 3 karakter', color: 'text-amber-500', valid: false };
+    return { message: 'Nama sudah sesuai', color: 'text-green-600', valid: true };
+  };
+
+  const getAddressStatus = (address) => {
+    if (!address.trim()) return { message: '', color: '', valid: false };
+    if (address.trim().length < 10) return { message: 'Min. 10 karakter', color: 'text-amber-500', valid: false };
+    return { message: 'Alamat sudah lengkap', color: 'text-green-600', valid: true };
+  };
+
+  // Panggil di atas return
+  const nameStatus = getNameStatus(formData.name);
+  const addressStatus = getAddressStatus(formData.address);
+  const phoneStatus = getPhoneStatus(formData.phone);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -143,80 +178,102 @@ const CheckoutModal = ({ isOpen, onClose, items, setItems }) => {
                 </div>
               ) : (
                 /* Tab 2: Form */
-                <form onSubmit={handleSubmit} className="space-y-4 text-primary animate-fade-in">
-                  <h3 className="font-display text-xl font-bold text-primary mb-6">Isi Data Anda</h3>
+                <form onSubmit={handleSubmit} className="space-y-6 text-primary animate-fade-in">
+                  {/* INPUT NAMA */}
                   <div>
-                    <div className="label flex flex-row justify-between">
-                      <label className="block text-xs font-bold text-primary mb-2 uppercase tracking-tighter">Nama Lengkap *</label>
-                      {formData.name.trim() && (
-                        <span className="text-xs text-green-600 flex items-center dark:text-green-400">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                          </svg>
-                          Terisi
+                    <div className="label flex justify-between items-center mb-2">
+                      <label className="text-[10px] font-bold text-primary uppercase tracking-widest">Nama Lengkap *</label>
+                      {nameStatus.message && (
+                        <span className={`text-[10px] font-bold ${nameStatus.color} flex items-center gap-1 animate-fade-in`}>
+                          {nameStatus.valid ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            ) : (
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            </svg>
+                          )}{nameStatus.message}
                         </span>
                       )}
                     </div>
                     <input 
                       required 
-                      className={`w-full px-4 py-3 bg-gray-50 outline-none ${formData.name.trim() ? 'input-success' : ''}`}
+                      className={`w-full px-4 py-3 bg-gray-50 outline-none border-2 transition-all 
+                        ${!formData.name.trim() ? 'border-gray-400' : (nameStatus.valid ? 'border-green-500' : 'border-amber-400')}`}
                       placeholder="Masukkan nama Anda"
                       value={formData.name}
                       onChange={(e) => setFormData({...formData, name: e.target.value})}
                     />
                   </div>
+
+                  {/* INPUT WHATSAPP */}
                   <div>
-                    <div className='label flex flex-row justify-between items-center'>
-                      <label className="block text-xs font-bold text-primary mb-2 uppercase tracking-tighter">Nomor WhatsApp *</label>
-                      {formData.phone.trim() && (
-                        <span className={`text-xs ${formData.phone.match(/^(08|62)\d{8,}$/) ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'} flex items-center`}>
-                          <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 mr-1 ${formData.phone.match(/^(08|62)\d{8,}$/) ? 'block' : 'hidden'}`} viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                          </svg>
-                          <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 mr-1 ${!formData.phone.match(/^(08|62)\d{8,}$/) ? 'block' : 'hidden'}`} viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                          </svg>
-                          {formData.phone.match(/^(08|62)\d{8,}$/) ? 'Valid' : 'Masukkan nomor yang valid'}
+                    <div className='label flex justify-between items-center mb-2'>
+                      <label className="text-[10px] font-bold text-primary uppercase tracking-widest">Nomor WhatsApp *</label>
+                      {phoneStatus.message && (
+                        <span className={`text-[10px] font-bold ${phoneStatus.color} flex items-center gap-1 animate-fade-in`}>
+                          {phoneStatus.valid ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            ) : (
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            </svg>
+                          )}{phoneStatus.message}
                         </span>
                       )}
                     </div>
                     <input 
                       required type="tel" 
-                      className={`w-full px-4 py-3 bg-gray-50  outline-none ${formData.phone.match(/^(08|62)\d{8,}$/) ? 'input-success' : (formData.phone.trim() ? 'input-error' : '')}`}
+                      className={`w-full px-4 py-3 bg-gray-50 outline-none border-2 transition-all 
+                        ${!formData.phone.trim() ? 'border-gray-400' : (phoneStatus.valid ? 'border-green-500' : 'border-red-400')}`}
                       placeholder="Contoh: 08123456789"
                       value={formData.phone}
                       onChange={(e) => setFormData({...formData, phone: e.target.value})}
                     />
                   </div>
+
+                  {/* INPUT ALAMAT */}
                   <div>
-                    <div className="label flex flex-row justify-between">
-                      <label className="block text-xs font-bold text-primary mb-2 uppercase tracking-tighter">Alamat Lengkap *</label>
-                      {formData.address.trim() && (
-                        <span className="text-xs text-green-600 flex items-center dark:text-green-400">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                          </svg>
-                          Terisi
+                    <div className="label flex justify-between items-center mb-2">
+                      <label className="text-[10px] font-bold text-primary uppercase tracking-widest">Alamat *</label>
+                      {addressStatus.message && (
+                        <span className={`text-[10px] font-bold ${addressStatus.color} flex items-center gap-1 animate-fade-in`}>
+                          {addressStatus.valid ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            ) : (
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            </svg>
+                          )}{addressStatus.message}
                         </span>
                       )}
                     </div>
                     <textarea 
                       required rows="3" 
-                      className={`w-full px-4 py-3 bg-gray-50  outline-none ${formData.address.trim() ? 'input-success' : ''}`} 
-                      placeholder="Nama Desa / Kelurahan, Kecamatan, Kota"
+                      className={`w-full px-4 py-3 bg-gray-50 outline-none border-2 transition-all 
+                        ${!formData.address.trim() ? 'border-gray-400' : (addressStatus.valid ? 'border-green-500' : 'border-amber-400')}`} 
+                      placeholder="Contoh: Desa Nung Geni Nyu Anyar"
                       value={formData.address}
                       onChange={(e) => setFormData({...formData, address: e.target.value})}
                     />
                   </div>
 
+                  {/* TOMBOL AKSI */}
                   <div className="flex gap-3 pt-4">
-                    <button type="button" onClick={() => setActiveTab('review')} className="flex-2 px-8 border-2 border-primary text-primary font-bold py-4 text-xs tracking-widest">KEMBALI</button>
+                    <button type="button" onClick={() => setActiveTab('review')} className="flex-1 border-2 border-primary text-primary font-bold py-4 text-xs tracking-widest hover:bg-primary/5">
+                      KEMBALI
+                    </button>
                     <button 
                       type="submit" 
-                      disabled={status === 'loading'}
-                      className="flex-1 bg-accent-green hover:bg-accent-green-dark text-white font-bold py-4 px-8 text-xs tracking-[0.2em] transition-all disabled:bg-gray-300"
+                      disabled={status === 'loading' || !nameStatus.valid || !phoneStatus.valid || !addressStatus.valid}
+                      className="flex-[2] bg-accent-green hover:bg-accent-green-dark text-white font-bold py-4 px-8 text-xs tracking-[0.2em] transition-all shadow-lg disabled:bg-gray-300 disabled:shadow-none"
                     >
-                      {status === 'loading' ? 'SEDANG MEMPROSES...' : 'KIRIM PESANAN'}
+                      {status === 'loading' ? 'MEMPROSES...' : 'KIRIM PESANAN'}
                     </button>
                   </div>
                 </form>
