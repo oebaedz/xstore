@@ -1,10 +1,8 @@
 import { useContext, useState } from "react";
 import { StoreContext } from "../../StoreContext";
-import Alert from "../Alert";
 
 export default function ProductCard( { product, setIsCartOpen } ) {
   const { items, addToCart } = useContext(StoreContext);
-  const [alert, setAlert] = useState(false);
   const [selectedVariant, setSelectedVariant] = useState(product.variants[0].id);
   const selectedVariantDetails = product.variants.find(v => v.id === selectedVariant);
 
@@ -26,17 +24,14 @@ export default function ProductCard( { product, setIsCartOpen } ) {
         productId: product.id,
         name: product.name,
         variantName: selectedVariantDetails.name,
+        variantId: selectedVariantDetails.id,
         price: selectedVariantDetails.price,
         image: product.image,
       };
 
-      console.log("Adding to cart:", payload);
+      console.log("Adding to cart:", selectedVariantDetails);
       addToCart(payload);
       setIsCartOpen(true)
-      // setAlert(true);
-      setTimeout(() => {
-        setAlert(false);
-      }, 5000);
     }
   };
 

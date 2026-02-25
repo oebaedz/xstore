@@ -9,7 +9,7 @@ const ProductForm = ({ existingProduct, onSaveSuccess }) => {
   const [product, setProduct] = useState({
     name: '',
     desc: '',
-    category: 'Bingkai',
+    category: '',
     image: '',
     variants: [] // Array JSONB kita
   });
@@ -26,7 +26,7 @@ const ProductForm = ({ existingProduct, onSaveSuccess }) => {
 
   // --- LOGIKA DINAMIS VARIANT ---
   const addVariantField = () => {
-    const newVar = { id: Date.now().toString(), name: '', price: "", image: '' };
+    const newVar = { id: Date.now().toString(), name: '', price: ""};
     setProduct({ ...product, variants: [...product.variants, newVar] });
   };
 

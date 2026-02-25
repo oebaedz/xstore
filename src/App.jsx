@@ -15,6 +15,8 @@ import ProductSale from "./pages/ProductSale";
 import ProductFormPage from "./pages/ProductFormPage";
 import { ToastProvider } from "./context/ToastContext";
 import SuccessPage from "./pages/SuccsessPage";
+import SettingsPage from "./pages/SettingsPage";
+import RecapPage from "./pages/RecapPage";
 
 function App() {
   const itemsFromLocalStorage = JSON.parse(localStorage.getItem('cart')) || []
@@ -72,7 +74,9 @@ function App() {
                 <Route path="/products" element={<ProductSale />} />
                 <Route path="/products/add" element={<ProductFormPage />} />
                 <Route path="/products/edit/:id" element={<ProductFormPage />} />
+                <Route path="/recap" element={<RecapPage />} />
                 <Route path="/orders" element={<Dashboard />} />
+                <Route path="/settings" element={<SettingsPage />} />
             </Route>
           </Routes>
         </StoreContext.Provider>

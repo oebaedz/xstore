@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { LayoutDashboard, Package, ShoppingCart, Menu, LogOut } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, Menu, LogOut, SettingsIcon, FilesIcon } from 'lucide-react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import supabase from '../createClient'
 
@@ -7,6 +7,8 @@ const AdminLayout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [orderItems, setOrderItems] = useState([]);
+  const [appSettings, setAppSettings] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -14,21 +16,29 @@ const AdminLayout = ({ children }) => {
     { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
     { name: 'Produk', icon: <Package size={20} />, path: '/products' },
     { name: 'Pesanan', icon: <ShoppingCart size={20} />, path: '/orders' },
+    { name: 'Rekap', icon: <FilesIcon size={20} />, path: '/recap' },
+    { name: 'Pengaturan', icon: <SettingsIcon size={20} />, path: '/settings' },
   ];
   const fetchAdminData = useCallback(async () => {
     try {
       setLoading(true);
       // Kita ambil data secara paralel agar cepat
-      const [prodRes, orderRes] = await Promise.all([
+      const [prodRes, orderItemsRes, orderRes, appSettingsRes] = await Promise.all([
         supabase.from('products').select('*').order('name', { ascending: false }),
-        supabase.from('orders').select('*').order('created_at', { ascending: false })
+        supabase.from('order_items').select('*').order('product_id', { ascending: false }),
+        supabase.from('orders').select('*').order('created_at', { ascending: false }),
+        supabase.from('app_settings').select('*')
       ]);
 
       if (prodRes.error) throw prodRes.error;
+      if (orderItemsRes.error) throw orderItemsRes.error;
       if (orderRes.error) throw orderRes.error;
+      if (appSettingsRes.error) throw appSettingsRes.error;
 
       setProducts(prodRes.data || []);
+      setOrderItems(orderItemsRes.data || []);
       setOrders(orderRes.data || []);
+      setAppSettings(appSettingsRes.data || []);
     } catch (error) {
       console.error('Error fetching admin data:', error);
     } finally {
@@ -39,7 +49,6 @@ const AdminLayout = ({ children }) => {
   useEffect(() => {
     fetchAdminData();
   }, [fetchAdminData]);
-
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -114,7 +123,7 @@ const AdminLayout = ({ children }) => {
           {loading && (
             <div className="h-1 bg-emerald-500 animate-pulse w-full fixed top-16 z-[60]" />
           )}
-          <Outlet context={{ products, orders, refreshData: fetchAdminData }} />
+          <Outlet context={{ products, orders, orderItems, appSettings, refreshData: fetchAdminData }} />
         </main>
       </div>
     </div>

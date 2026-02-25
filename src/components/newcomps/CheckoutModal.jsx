@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import supabase from '../createClient';
 import sendWhatsApp from '../../context/sendWhatsApp';
-import { CheckCircleIcon } from 'lucide-react';
 
 const CheckoutModal = ({ isOpen, onClose, items, setItems }) => {
   const [activeTab, setActiveTab] = useState('review'); // 'review' | 'form'
   const [status, setStatus] = useState('idle'); // 'idle' | 'loading' | 'success'
   const [formData, setFormData] = useState({ name: '', phone: '', address: '' });
   const navigate = useNavigate();
+
+  console.log("Items di CheckoutModal:", items);
 
   if (!isOpen) return null;
 
@@ -79,8 +80,8 @@ const CheckoutModal = ({ isOpen, onClose, items, setItems }) => {
 
       const itemsToInsert = items.map(item => ({
         order_id: orderId,
-        product_id: item.product_id,
-        variant_id: item.variant_id,
+        product_id: item.productId,
+        variant_id: item.variantId,
         price: item.price,
         qty: item.qty,
         subtotal: item.qty * item.price,
