@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import supabase from '../components/createClient';
 import { Plus, Trash2, Save, Package } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
+import ImageUploader from '../components/newcomps/ImageUploader';
 
 const ProductForm = ({ existingProduct, onSaveSuccess }) => {
   const [loading, setLoading] = useState(false);
@@ -91,14 +92,19 @@ const ProductForm = ({ existingProduct, onSaveSuccess }) => {
 
         <div className="space-y-4">
           <h2 className="font-bold text-slate-800 text-lg">Foto Utama</h2>
-          <input 
+          {/* <input 
             name="image" value={product.image} onChange={handleMainChange}
             placeholder="URL Gambar Utama" 
             className="w-full focus:ring-2 focus:ring-emerald-600 text-slate-800 p-3 bg-slate-50 border border-slate-200 rounded-2xl outline-none"
-          />
+            /> */}
           {product.image && (
             <img src={product.image} className="w-full h-40 object-contain rounded-2xl border" alt="Preview" />
           )}
+          <ImageUploader 
+            folder="product-images"
+            aspectRatio='w-full h-16'
+            onUploadSuccess={(url) => setProduct({ ...product, image: url })}
+          />
         </div>
       </section>
 

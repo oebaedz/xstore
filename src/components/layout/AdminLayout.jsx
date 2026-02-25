@@ -24,7 +24,7 @@ const AdminLayout = ({ children }) => {
       setLoading(true);
       // Kita ambil data secara paralel agar cepat
       const [prodRes, orderItemsRes, orderRes, appSettingsRes] = await Promise.all([
-        supabase.from('products').select('*').order('name', { ascending: false }),
+        supabase.from('products').select('*').order('category', { ascending: true }),
         supabase.from('order_items').select('*').order('product_id', { ascending: false }),
         supabase.from('orders').select('*').order('created_at', { ascending: false }),
         supabase.from('app_settings').select('*')

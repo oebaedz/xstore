@@ -3,7 +3,7 @@ import { useOutletContext } from 'react-router-dom';
 import supabase from '../components/createClient';
 import sendWhatsApp from '../context/sendWhatsApp';
 import { useToast } from '../context/ToastContext';
-import { Edit3, MessageCircle, X, Check  } from 'lucide-react';
+import { MessageCircle, X, Check  } from 'lucide-react';
 
 
 export default function Dashboard() {

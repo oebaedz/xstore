@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { useToast } from "../context/ToastContext";
 import supabase from "../components/createClient";
+import ImageUploader from "../components/newcomps/ImageUploader";
 
 export default function SettingsPage() {
     const { appSettings, refreshData } = useOutletContext();
@@ -131,7 +132,7 @@ export default function SettingsPage() {
                     {/* Image Preview List */}
                     <div className="grid grid-cols-2 gap-3 mb-6">
                         {carouselImages.map((img, idx) => (
-                        <div key={idx} className="relative aspect-video rounded-2xl overflow-hidden group">
+                        <div key={idx} className="relative aspect-image rounded-2xl overflow-hidden group">
                             <img src={img} className="w-full h-full object-cover" alt="Preview" />
                             <button 
                             onClick={() => handleRemoveImage(idx)}
@@ -143,10 +144,16 @@ export default function SettingsPage() {
                         ))}
                         
                         {/* Tombol Tambah (Placeholder) */}
-                        <button className="aspect-video rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 hover:bg-slate-50 transition-colors">
+                        {/* <button className="aspect-video rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 hover:bg-slate-50 transition-colors">
                             <Plus size={20} />
                             <span className="text-[9px] font-bold uppercase mt-1">Tambah Foto</span>
-                        </button>
+                        </button> */}
+
+                        <ImageUploader 
+                            folder="carousel"
+                            aspectRatio='aspect-image'
+                            onUploadSuccess={(url) => setCarouselImages([...carouselImages, url])}
+                        />
                     </div>
 
                     <p className="text-[9px] text-slate-400 italic">
