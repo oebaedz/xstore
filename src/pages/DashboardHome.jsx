@@ -4,7 +4,7 @@ import { Link, useOutletContext } from "react-router-dom";
 import sendWhatsApp from "../context/sendWhatsApp";
 
 const DashboardHome = () => {
-    const {orders = []} = useOutletContext();
+    const {orders = [], orderItems, products} = useOutletContext();
     const [activeOrder, setActiveOrder] = useState(null); // State untuk popup heatmap
     const popupRef = useRef(null);
 
@@ -46,58 +46,96 @@ const DashboardHome = () => {
                 acc.piutang += total;
             }
 
-            // Hitung Total Item untuk XP
-            // order.items.forEach(item => {
-            //     acc.totalItem += item.qty || 1;
-            // });
-
             return acc;
         }, { lunas: 0, sudahDp: 0, belumBayar: 0, piutang: 0});
     }, [orders]);
 
-    const totalItem = orders.length
-    stats.totalItem = totalItem;
-
-    // Logika Gamifikasi (XP dan Level)
+    // Gamifikasi Logic
+    const totalXP = orders.length;
     const xpPerLevel = 10;
-    const currentLevel = Math.floor(stats.totalItem / xpPerLevel) + 1;
-    const progressXP = stats.totalItem % xpPerLevel
+    const currentLevel = Math.floor(totalXP / xpPerLevel) + 1;
+    const progressXP = totalXP % xpPerLevel;
+
+    const getRank = (level) => {
+        const ranks = ['Newbie', 'Warrior', 'Knight', 'Master', 'Epic', 'Legend', 'Mythic', 'Immortal', 'Ascended', 'Eternal', 'Divine', 'Godlike'];
+        return ranks[Math.min(level - 1, ranks.length - 1)];
+    }
 
     // Daftar Top 3 Piutang Customers
-    const listPiutang = orders
-        .filter(order => order.status !== "lunas")
-        .sort((a, b) => ((b.total - (b.dibayar || 0)) - (a.total - (a.dibayar || 0))))
-        .slice(0, 3);
+    const listPiutang = useMemo(() => {
+        return [...orders]
+            .filter(order => order.status !== "lunas")
+            .sort((a, b) => {
+                const sisaA = a.total_harga - (a.dibayar || 0);
+                const sisaB = b.total_harga - (b.dibayar || 0);
+                return sisaB - sisaA;
+            })
+            .slice(0, 3);
+    }, [orders]);
 
+    const topProducts = useMemo(() => {
+        // 1. Hitung total seluruh item yang terjual
+        const totalAllItems = orderItems.reduce((sum, item) => sum + (Number(item.qty) || 0), 0);
+
+        // 2. Grouping Qty per produk
+        const counts = orderItems.reduce((acc, item) => {
+            const id = item.product_id;
+            const qty = Number(item.qty) || 0;
+            acc[id] = (acc[id] || 0) + qty;
+            return acc;
+        }, {});
+
+        // 3. Map ke format UI
+        const result = Object.keys(counts).map(id => {
+            const productInfo = products?.find(p => p.id === id);
+            const qty = counts[id];
+            
+            // Hitung berapa persen kontribusi produk ini terhadap total jualan
+            const sharePercentage = totalAllItems > 0 
+            ? Math.round((qty / totalAllItems) * 100) 
+            : 0;
+
+            return {
+            id,
+            name: productInfo?.name || "Produk",
+            totalQty: qty,
+            share: sharePercentage
+            };
+        });
+
+        return result.sort((a, b) => b.totalQty - a.totalQty).slice(0, 3);
+    }, [orders, products]);
 
     return (
         <div className="p-4 space-y-8 pb-10">
             {/* SECTION: GAMIFIED HEADER */}
-            <section className="bg-gradient-to-r from-green-800 to-accent-green-dark rounded-[32px] p-6 text-white shadow-xl shadow-indigo-200">
-                <div className="flex justify-between items-center mb-4">
-                <div className="flex items-center gap-3">
-                    <div className="p-2 bg-white/20 rounded-xl backdrop-blur-md">
-                    <Trophy className="w-6 h-6 text-yellow-300" />
+            <section className="relative overflow-hidden bg-gradient-to-br from-emerald-900 via-emerald-800 to-slate-900 rounded-[2.5rem] p-5 text-white shadow-2xl shadow-emerald-200">
+                <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
+                
+                <div className="relative z-10 flex justify-between items-center mb-6">
+                    <div className="flex items-center gap-4">
+                        <div className="p-3 bg-white/15 rounded-2xl backdrop-blur-xl border border-white/20">
+                            <Trophy className="w-6 h-6 text-yellow-400" />
+                        </div>
+                        <div>
+                            <p className="text-[10px] font-black opacity-60 uppercase tracking-[0.2em]">{getRank(currentLevel)} Rank</p>
+                            <h2 className="text-2xl font-black tracking-tighter italic">LVL. {currentLevel}</h2>
+                        </div>
                     </div>
-                    <div>
-                    <p className="text-xs font-bold opacity-80 uppercase tracking-wider">Level Warrior</p>
-                    <h2 className="text-xl font-black italic">LEVEL {currentLevel}</h2>
+                    <div className="text-right">
+                        <p className="text-3xl font-black tracking-tighter">{totalXP}</p>
+                        <p className="text-[10px] font-bold opacity-60 uppercase">Total XP</p>
                     </div>
                 </div>
-                <div className="text-right">
-                    <p className="text-2xl font-black">{stats.totalItems}</p>
-                    <p className="text-[10px] font-bold opacity-70 uppercase">Total XP (Items)</p>
+
+                <div className="relative h-4 bg-black/20 rounded-full p-1 border border-white/5">
+                    <div 
+                        className="h-full bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-400 rounded-full transition-all duration-1000 shadow-[0_0_15px_rgba(250,204,21,0.4)]"
+                        style={{ width: `${(progressXP / xpPerLevel) * 100}%` }}
+                    />
                 </div>
-                </div>
-                {/* Progress Bar */}
-                <div className="w-full bg-white/20 h-4 rounded-full overflow-hidden border border-white/10">
-                <div 
-                    className="h-full bg-gradient-to-r from-yellow-300 to-orange-400 transition-all duration-1000"
-                    style={{ width: `${progressXP * 10}%` }}
-                ></div>
-                </div>
-                <p className="text-[10px] mt-2 font-bold text-center opacity-80">
-                {xpPerLevel - progressXP} item lagi untuk naik ke Level {currentLevel + 1}! 🚀
+                <p className="text-[10px] mt-4 font-black text-center text-emerald-100/80 uppercase tracking-widest">
+                    {xpPerLevel - progressXP} ITEMS TO REACH LEVEL {currentLevel + 1} 🚀
                 </p>
             </section>
 
@@ -151,39 +189,57 @@ const DashboardHome = () => {
                 </div>
             </section>
 
-            {/* --- SECTION: PRODUCTION SUMMARY (COLLAPSIBLE-READY) --- */}
-            <section className="bg-slate-900 rounded-[32px] p-6 text-white overflow-hidden relative">
-                <div className="absolute top-0 right-0 p-8 opacity-10">
-                <PackageCheck size={120} />
-                </div>
-                <div className="relative z-10">
-                <h3 className="font-bold mb-4 flex items-center gap-2">
-                    <TrendingUp size={18} className="text-indigo-400" /> Produk Terlaris
-                </h3>
-                <div className="space-y-4">
-                    {/* Simple Horizontal Bar Simulation */}
-                    <div className="space-y-1">
-                    <div className="flex justify-between text-xs font-bold mb-1">
-                        <span>Kaos Alumni</span>
-                        <span>45 Pcs</span>
+            {/* --- SECTION: PRODUCTION SUMMARY (MODERN DARK MODE) --- */}
+            <section className="relative overflow-hidden bg-slate-950 rounded-[2.5rem] p-7 text-white shadow-2xl">
+                <div className="relative z-10 space-y-6">
+                    <h3 className="text-sm font-black text-emerald-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                    <TrendingUp size={18} /> Produk Terlaris
+                    </h3>
+
+                    <div className="space-y-6">
+                    {topProducts.map((prod, index) => {
+                        // Hitung persentase bar (misal: dibanding produk terlaris nomor 1)
+                        const maxQty = topProducts[0].totalQty + 1
+                        const percentage = (prod.totalQty / maxQty) * 100;
+
+                        return (
+                        <div key={prod.id} className="space-y-3">
+                            <div className="flex justify-between items-start">
+                            <div className="space-y-1">
+                                <span className="block text-xs font-black uppercase text-slate-400">
+                                #{index + 1} {prod.name}
+                                </span>
+                                <div className="flex items-center gap-2">
+                                <span className="text-2xl font-black italic">{prod.totalQty}</span>
+                                <span className="text-[10px] font-bold text-slate-500 uppercase">Pcs Terjual</span>
+                                </div>
+                            </div>
+                            {/* BADGE MARKET SHARE */}
+                                <div className="flex flex-col items-end gap-1">
+                                    <span className={`text-[10px] font-black px-3 py-1 rounded-lg border ${index === 0 ? 'bg-emerald-500/20 border-emerald-500 text-emerald-500' : index === 1 ? 'bg-amber-400/20 border-amber-400 text-amber-400' : 'bg-red-500/20 border-red-500 text-red-500'}`}>
+                                    {prod.share}%
+                                    </span>
+                                    <span className="font-light text-[10px] text-slate-500">of all sales</span>
+                                </div>
+                            </div>
+                            {/* Bar Dinamis */}
+                            <div className="relative w-full bg-white/5 h-2.5 rounded-full overflow-hidden">
+                            <div 
+                                className={`absolute inset-y-0 left-0 rounded-full transition-all duration-1000 ${
+                                index === 0 ? 'bg-gradient-to-r from-emerald-700 to-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.4)]' : index === 1 ? 'bg-gradient-to-r from-amber-600 to-amber-400 shadow-[0_0_12px_rgba(16,185,129,0.4)]' : 'bg-gradient-to-r from-red-600 to-red-400 shadow-[0_0_12px_rgba(16,185,129,0.4)]'
+                                }`}
+                                style={{ width: `${percentage}%` }}
+                            />
+                            </div>
+                        </div>
+                        );
+                    })}
                     </div>
-                    <div className="w-full bg-white/10 h-2 rounded-full">
-                        <div className="bg-indigo-400 h-full rounded-full w-[85%]"></div>
-                    </div>
-                    </div>
-                    <div className="space-y-1">
-                    <div className="flex justify-between text-xs font-bold mb-1">
-                        <span>Bingkai 20R</span>
-                        <span>12 Pcs</span>
-                    </div>
-                    <div className="w-full bg-white/10 h-2 rounded-full">
-                        <div className="bg-emerald-400 h-full rounded-full w-[40%]"></div>
-                    </div>
-                    </div>
-                </div>
-                <button className="w-full mt-6 py-3 bg-white/10 hover:bg-white/20 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 transition-all">
-                    Detail Ringkasan Produksi <ChevronRight size={14} />
-                </button>
+                    
+                    {/* Tombol yang tetap konsisten */}
+                    <Link to='/recap' className="w-full mt-2 py-4 bg-white/5 border border-white/10 rounded-3xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all active:scale-95">
+                    Lihat Analitik Lengkap <ChevronRight className="text-emerald-600" size={14} />
+                    </Link>
                 </div>
             </section>
 

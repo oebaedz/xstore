@@ -4,44 +4,46 @@ import { useOutletContext } from "react-router-dom";
 
 
 export default function RecapPage() {
-  // Di dalam DashboardProduction.jsx atau sejenisnya
-  const { products = [], orders = [], items = [] } = useOutletContext();
-  const [activeTab, setActiveTab] = useState("Semua");
-  // 1. Ambil kategori unik secara dinamis
-  const categories = useMemo(() => {
-    const cats = [...new Set(products.map(p => p.category))];
-    return ["Semua", ...cats];
-  }, [products]);
+    // Di dalam DashboardProduction.jsx atau sejenisnya
+    const { products = [], orders = [], orderItems = [] } = useOutletContext();
+    const [activeTab, setActiveTab] = useState("Semua");
+    // 1. Ambil kategori unik secara dinamis
+    const categories = useMemo(() => {
+        const cats = [...new Set(products.map(p => p.category))];
+        return ["Semua", ...cats];
+    }, [products]);
 
     // 2. Filter & Ringkas Data berdasarkan Kategori yang dipilih
     const productionData = useMemo(() => {
-    const summary = {};
+        const summary = {};
 
-    orders.forEach(order => {
-        order.items?.forEach(item => {
-        // Kita butuh category dari data product asli untuk filtering
-        const productInfo = products.find(p => p.id === item.product_id);
-        const category = productInfo?.category || "Lainnya";
+        orderItems.forEach(item => {
+            // Kita butuh category dari data product asli untuk filtering
+            const productInfo = products.find(p => p.id === item.product_id);
+            const category = productInfo?.category || "Lainnya";
+            const variantName = productInfo?.variants?.find(v => v.id === item.variant_id)?.name || "Default";
 
-        if (activeTab === "Semua" || category === activeTab) {
-            const key = `${item.product_name} | ${item.variant_name}`;
-            if (!summary[key]) {
-            summary[key] = { 
-                name: item.product_name, 
-                variant: item.variant_name, 
-                qty: 0,
-                category: category
-            };
+            if (activeTab === "Semua" || category === activeTab) {
+                const key = `${item.product_name} | ${item.variant_id}`;
+                if (!summary[key]) {
+                summary[key] = { 
+                    name: productInfo?.name, 
+                    variant: variantName, 
+                    qty: 0,
+                    category: category
+                };
+                }
+                summary[key].qty += (item.qty || 1);
             }
-            summary[key].qty += (item.qty || 1);
-        }
         });
-    });
 
-    return Object.values(summary);
+        return Object.values(summary);
     }, [orders, products, activeTab]);
+
+    console.log("Production Data:", productionData);
+
     return (
-        <div className="space-y-6 pb-20">
+        <div className="space-y-6 p-4">
             {/* --- DYNAMIC TABS (Horizontal Scroll) --- */}
             <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar px-1">
             {categories.map(cat => (
