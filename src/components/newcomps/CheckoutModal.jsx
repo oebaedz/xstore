@@ -9,8 +9,6 @@ const CheckoutModal = ({ isOpen, onClose, items, setItems }) => {
   const [formData, setFormData] = useState({ name: '', phone: '', address: '' });
   const navigate = useNavigate();
 
-  console.log("Items di CheckoutModal:", items);
-
   if (!isOpen) return null;
 
   const total = items.reduce((acc, item) => acc + (item.price * item.qty), 0);
@@ -63,7 +61,7 @@ const CheckoutModal = ({ isOpen, onClose, items, setItems }) => {
       dibayar: 0,
     }
 
-    const message = `Terima kasih, pesanan Anda telah kami terima dengan rincian sebagai berikut:\n\nNama: *${formData.name}*\nNo. HP: *${formData.phone}*\nAlamat: *${formData.address}*\nOrderan:\n${items.map(item => `- ${item.name} x ${item.qty} = Rp ${item.price * item.qty}`).join('\n')}\nTotal Harga: *Rp ${total.toLocaleString("id-ID")}*\n\nMohon lakukan pembayaran DP minimal 50% ke rekening berikut:\nBRI a/n: A. JAMIL HIDAYATULLAH\nNo. Rekening: 0582-0102-0919-50-4\n\nSetelah melakukan pembayaran, silakan konfirmasi melalui WhatsApp di 6282228326870\n\nTerima kasih atas kepercayaan Anda kepada kami!`;
+    const message = `*IKSADA STORE*\n\nTerima kasih, pesanan Anda telah kami terima dengan rincian sebagai berikut:\n\nNama: *${formData.name}*\nNo. HP: *${formData.phone}*\nAlamat: *${formData.address}*\n\nOrderan:\n${items.map(item => `- ${item.name} x ${item.qty} = Rp ${item.price * item.qty}`).join('\n')}\n\nTotal Harga: *Rp ${total.toLocaleString("id-ID")}*\n\nMohon lakukan pembayaran DP minimal 50% ke rekening berikut:\nBRI a/n: A. JAMIL HIDAYATULLAH\nNo. Rekening: 0582-0102-0919-50-4\nKonfirmasi (WhatsApp) : 082228326870\n\nTerima kasih atas kepercayaan Anda kepada kami!`;
 
     try {
       const { data: orderData, error: orderError } = await supabase

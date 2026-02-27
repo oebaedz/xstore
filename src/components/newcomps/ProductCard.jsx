@@ -29,7 +29,6 @@ export default function ProductCard( { product, setIsCartOpen } ) {
         image: product.image,
       };
 
-      console.log("Adding to cart:", selectedVariantDetails);
       addToCart(payload);
       setIsCartOpen(true)
     }

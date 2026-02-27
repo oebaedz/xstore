@@ -40,8 +40,6 @@ export default function RecapPage() {
         return Object.values(summary);
     }, [orders, products, activeTab]);
 
-    console.log("Production Data:", productionData);
-
     return (
         <div className="space-y-6 p-4">
             {/* --- DYNAMIC TABS (Horizontal Scroll) --- */}
