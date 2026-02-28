@@ -95,9 +95,9 @@ const ProductSale = () => {
           <p className="text-slate-400">Coba kata kunci lain atau tambah produk baru.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredProducts.map((product) => (
-            <div key={product.id} className="group bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-2xl hover:shadow-slate-200/50 transition-all flex flex-col">
+            <div key={product.id} className="group bg-white rounded-2xl p-4 border border-slate-100 shadow-sm hover:shadow-2xl hover:shadow-slate-200/50 transition-all flex flex-col">
               
               {/* IMAGE WRAPPER */}
               <div className="relative aspect-video mb-6 overflow-hidden rounded-[2rem] bg-slate-50 border border-slate-50">
@@ -115,18 +115,18 @@ const ProductSale = () => {
 
               {/* CONTENT */}
               <div className="flex-1 space-y-2 px-1">
-                <h3 className="text-xl font-extrabold text-slate-800 leading-tight group-hover:text-emerald-600 transition-colors">
+                <h3 className="text-base font-extrabold text-slate-800 leading-tight group-hover:text-emerald-600 transition-colors">
                   {product.name}
                 </h3>
                 
                 <div className="flex items-center justify-between pt-2">
                   <div className="flex items-center gap-1.5 text-slate-400">
                     <Layers className="w-4 h-4" />
-                    <span className="text-xs font-bold uppercase tracking-tighter">{product.variants?.length || 0} Varian</span>
+                    <span className="text-xs font-light uppercase tracking-tighter">{product.variants?.length || 0} Varian</span>
                   </div>
                   <div className="text-right">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase leading-none">Mulai dari</p>
-                    <p className="text-lg font-black text-emerald-600">
+                    <p className="text-[10px] font-light text-slate-400 uppercase leading-none">Mulai dari</p>
+                    <p className="text-base font-black text-emerald-600">
                       Rp {product.variants?.length > 0 
                         ? Math.min(...product.variants.map(v => v.price)).toLocaleString('id-ID') 
                         : '0'}

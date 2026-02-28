@@ -5,22 +5,26 @@ import NewHero from "./NewHero";
 import ProductCard from "./newcomps/ProductCard";
 import CartSidebar from "./newcomps/CartSidebar";
 import CheckoutModal from "./newcomps/CheckoutModal";
-import pic from "../assets/catalog.jpg";
 
 const Home = () => {
   const { items, setItems, isCartOpen, setIsCartOpen } = useContext(StoreContext);
   const [dataProducts, setDataProducts] = useState([]);
+  const [deadline, setDeadline] = useState(null);
+  const [banners, setBanners] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState('Semua');
   const fetchAdminData = async () => {
       setLoading(true);
       // Kita ambil data secara paralel agar cepat
-      const [prodRes] = await Promise.all([
+      const [prodRes, settingsRes] = await Promise.all([
         supabase.from('products').select('*').order('category', { ascending: true }),
+        supabase.from('app_settings').select('*'),
       ]);
   
       setDataProducts(prodRes.data || []);
+      setBanners(settingsRes.data?.find(s => s.key === 'hero_carousel')?.value || []);
+      setDeadline(settingsRes.data?.find(s => s.key === 'sale_deadline')?.value || null);
       setLoading(false);
     };
   
@@ -28,11 +32,8 @@ const Home = () => {
     fetchAdminData();
   }, []);
 
-  const banners = [
-    pic,
-    "https://kaos-halalbihalal10.vercel.app/assets/Cat-3R5N9Oct.jpeg",
-    pic,
-  ];
+  console.log(banners, deadline, dataProducts);
+
 
   const categories = useMemo(() => {
     const cats = new Set(dataProducts.map(p => p.category));
