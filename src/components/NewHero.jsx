@@ -7,7 +7,7 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/effect-coverflow';
 
-const NewHero = ({ banners = [] }) => {
+const NewHero = ({ banners = [], deadline }) => {
   const [selectedImg, setSelectedImg] = useState(null);
 
   if (!banners || banners.length === 0) return null;
@@ -40,7 +40,7 @@ const NewHero = ({ banners = [] }) => {
 
             {/* Countdown sekarang diletakkan di bawah text agar layout seimbang */}
             <div className="mt-10">
-              <Countdown />
+              <Countdown deadline={deadline} />
             </div>
           </div>
 

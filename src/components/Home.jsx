@@ -24,16 +24,13 @@ const Home = () => {
   
       setDataProducts(prodRes.data || []);
       setBanners(settingsRes.data?.find(s => s.key === 'hero_carousel')?.value || []);
-      setDeadline(settingsRes.data?.find(s => s.key === 'sale_deadline')?.value || null);
+      setDeadline(settingsRes.data?.find(s => s.key === 'po_schedule')?.value.end_date || null);
       setLoading(false);
     };
   
   useEffect(() => {
     fetchAdminData();
   }, []);
-
-  console.log(banners, deadline, dataProducts);
-
 
   const categories = useMemo(() => {
     const cats = new Set(dataProducts.map(p => p.category));
@@ -51,7 +48,7 @@ const Home = () => {
     <>
       <div className="min-h-screen">
         <div className="flex flex-col h-[100svh] md:h-auto overflow-hidden">
-          <NewHero banners={banners} />
+          <NewHero banners={banners} deadline={deadline} />
         </div>
 
         <section className="py-24 bg-gradient-to-b from-white to-gray-50">

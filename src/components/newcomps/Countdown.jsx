@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
-export default function Countdown() {
-  const closingDate = new Date("2026-02-29T23:59:59");
+export default function Countdown( { deadline } ) {
+  const closingDate = new Date(deadline);
   const [timeLeft, setTimeLeft] = useState(closingDate - new Date().getTime());
 
   useEffect(() => {
