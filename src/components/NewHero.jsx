@@ -6,9 +6,61 @@ import Countdown from "./newcomps/Countdown";
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/effect-coverflow';
+import Skeleton from "./newcomps/Skeleton";
 
-const NewHero = ({ banners = [], deadline }) => {
+const NewHero = ({ banners = [], deadline, loading }) => {
   const [selectedImg, setSelectedImg] = useState(null);
+
+  const HeroSkeleton = () => {
+    return (
+      <section className="relative min-h-screen flex flex-col justify-center bg-gradient-to-b from-primary via-[#075a45] to-[#086b52] py-16 md:py-24 overflow-hidden">
+        {/* Pattern tetap ditampilkan agar background tidak flat */}
+        <div className="arabesque-pattern absolute inset-0 opacity-40"></div>
+        
+        <div className="relative z-2 max-w-7xl mx-auto px-4 md:px-8 w-full">
+          <div className="flex md:mt-2 flex-col md:flex-row items-center gap-12">
+            
+            {/* KOLOM KIRI: Text & Countdown */}
+            <div className="w-full md:w-1/2 text-center md:text-left order-1 space-y-6">
+              <div className="hidden md:block">
+                <Skeleton className="h-12 w-48 rounded-lg opacity-20" />
+              </div>
+
+              <div className="space-y-3">
+                <Skeleton className="h-10 md:h-16 w-full md:w-[90%] rounded-xl opacity-20" />
+                <Skeleton className="h-10 md:h-16 w-2/3 mx-auto md:mx-0 rounded-xl opacity-20" />
+              </div>
+              
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-full max-w-2xl rounded-md opacity-20" />
+                <Skeleton className="h-4 w-3/4 max-w-2xl mx-auto md:mx-0 rounded-md opacity-20" />
+              </div>
+
+              <div className="mt-10 flex justify-center md:justify-start gap-4">
+                {/* Ceritanya kotak-kotak countdown */}
+                {[...Array(4)].map((_, i) => (
+                  <Skeleton key={i} className="h-16 w-16 md:h-20 md:w-20 rounded-xl opacity-20" />
+                ))}
+              </div>
+            </div>
+
+            {/* KOLOM KANAN: Placeholder Carousel */}
+            <div className="w-full md:w-1/2 order-2 flex justify-center items-center gap-4">
+              {/* Slide samping (kecil) */}
+              <Skeleton className="hidden md:block h-[350px] w-12 rounded-2xl opacity-10" />
+              {/* Slide utama (besar) */}
+              <Skeleton className="w-full max-w-[210px] md:max-w-[320px] h-[300px] md:h-[450px] rounded-2xl opacity-20 shadow-2xl" />
+              {/* Slide samping (kecil) */}
+              <Skeleton className="hidden md:block h-[350px] w-12 rounded-2xl opacity-10" />
+            </div>
+
+          </div>
+        </div>
+      </section>
+    );
+  };
+
+  if ( loading ) return <HeroSkeleton />;
 
   if (!banners || banners.length === 0) return null;
 

@@ -15,18 +15,30 @@ const Home = () => {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState('Semua');
   const fetchAdminData = async () => {
+    try {
       setLoading(true);
       // Kita ambil data secara paralel agar cepat
       const [prodRes, settingsRes] = await Promise.all([
-        supabase.from('products').select('*').order('category', { ascending: true }),
+        supabase
+          .from('products')
+          .select('*')
+          .order('category', { ascending: true })
+          .order('name', { ascending: true }),
         supabase.from('app_settings').select('*'),
       ]);
+
+      if (prodRes.error) throw prodRes.error;
+      if (settingsRes.error) throw settingsRes.error;
   
       setDataProducts(prodRes.data || []);
       setBanners(settingsRes.data?.find(s => s.key === 'hero_carousel')?.value || []);
       setDeadline(settingsRes.data?.find(s => s.key === 'po_schedule')?.value.end_date || null);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
       setLoading(false);
-    };
+    }
+  };
   
   useEffect(() => {
     fetchAdminData();
@@ -48,7 +60,7 @@ const Home = () => {
     <>
       <div className="min-h-screen">
         <div className="flex flex-col h-[100svh] md:h-auto overflow-hidden">
-          <NewHero banners={banners} deadline={deadline} />
+          <NewHero banners={banners} deadline={deadline} loading={loading} />
         </div>
 
         <section className="py-24 bg-gradient-to-b from-white to-gray-50">
