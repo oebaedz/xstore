@@ -45,16 +45,37 @@ export default function SettingsPage() {
         }
     }
 
-    
     const handleRemoveImage = async (index) => {
         setLoading(true);
+
+        // 1. Ambil URL lengkap dari gambar yang akan dihapus
+        const imageUrl = carouselImages[index];
+
+        // 2. Ekstrak nama file dari URL (asumsi URL berbentuk https://.../folder/filename.ext)
+        const fileName = imageUrl.split('/').pop();
+
+        // 3. Gabungkan dengan folder jika diperlukan (misal folder "carousel/filename.ext")
+        const filePath = `carousel/${fileName}`;
+
+        // 4. Siapkan data baru untuk carousel setelah penghapusan
         const updatedImages = carouselImages.filter((_, idx) => idx !== index);
-        setCarouselImages(updatedImages);
+
+
         try {
-            const { error } = await supabase.from('app_settings')
+            // 5. Hapus file dari Supabase Storage
+            const { error: storageError } = await supabase.storage
+                .from('assets')
+                .remove([filePath]);
+            if (storageError) throw storageError;
+
+            // 6. Update database dengan daftar gambar yang sudah diperbarui
+            const { error: dbError } = await supabase.from('app_settings')
                 .update({ value: updatedImages })
                 .eq('key', 'hero_carousel');
-            if (error) throw error;
+            if (dbError) throw dbError;
+
+            // 7. Update state lokal dan tampilkan notifikasi sukses
+            setCarouselImages(updatedImages);
             showToast('Foto berhasil dihapus dari carousel.', 'success');
             refreshData(); // Refresh data to reflect changes
         }
