@@ -11,7 +11,7 @@ const ProductForm = ({ existingProduct, onSaveSuccess }) => {
   const initialFormState = {
     name: '',
     desc: '',
-    category: 'Foto+Figura', // Beri default agar tidak null
+    category: 'Foto', // Beri default agar tidak null
     image: '',
     variants: []
   };
@@ -144,10 +144,9 @@ const ProductForm = ({ existingProduct, onSaveSuccess }) => {
               name="category" value={product.category} onChange={handleMainChange}
               className="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 outline-none"
             >
-              <option value="Foto+Figura">Foto + Figura</option>
               <option value="Foto">Foto</option>
               <option value="Kaos">Kaos</option>
-              <option value="Aksesoris">Aksesoris</option>
+              <option value="Ganci">Ganci</option>
             </select>
           </label>
 
