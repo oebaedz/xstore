@@ -7,6 +7,8 @@ const SuccessPage = () => {
   const order = location.state?.order;
   const items = location.state?.items || [];
 
+  console.log(order)
+
   useEffect(() => {
     window.scrollTo({
       top: 0,
@@ -80,7 +82,7 @@ const SuccessPage = () => {
               <ArrowLeft className="inline mr-2" size={12} /> BERANDA
             </Link>
             <a 
-              href={`https://wa.me/6282228326870?text=Konfirmasi%20Pesanan%20${order.nama}%20-%20Total%20Rp%20${order.total_harga.toLocaleString('id-ID')}`}
+              href={`https://wa.me/6282228326870?text=Konfirmasi%20Pesanan%20atas%20nama%20*${order.nama}*%20dari%20*${order.alamat}*%20-%20Total%20Rp%20${order.total_harga.toLocaleString('id-ID')}`}
               className="w-full bg-accent-green text-white text-center py-4 font-bold tracking-[0.2em] hover:bg-accent-green-dark transition-all text-xs md:text-sm flex-1"
             >
               BUKA WHATSAPP

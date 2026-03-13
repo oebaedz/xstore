@@ -87,7 +87,7 @@ const NewHero = ({ banners = [], deadline, loading }) => {
               Koleksi Eksklusif IKSADA
             </h1>
             
-            <p className="text-white/80 text-sm md:text-lg mb-8 max-w-2xl font-body font-light">
+            <p className="text-white/80 text-sm md:text-lg md:mb-8 max-w-2xl font-body font-light">
               Merchandise premium dalam rangka Reuni dan Halal Bihalal ke-11, Ikatan Santri dan Alumni PP Darul Lughah Wal Karomah.
             </p>
 

@@ -61,7 +61,7 @@ const CheckoutModal = ({ isOpen, onClose, items, setItems }) => {
       dibayar: 0,
     }
 
-    const message = `*IKSADA STORE*\n\nTerima kasih, pesanan Anda telah kami terima dengan rincian sebagai berikut:\n\nNama: *${formData.name}*\nNo. HP: *${formData.phone}*\nAlamat: *${formData.address}*\n\nOrderan:\n${items.map(item => `- ${item.name} x ${item.qty} = Rp ${item.price * item.qty}`).join('\n')}\n\nTotal Harga: *Rp ${total.toLocaleString("id-ID")}*\n\nMohon lakukan pembayaran DP minimal 50% ke rekening berikut:\nBRI a/n: A. JAMIL HIDAYATULLAH\nNo. Rekening: 0582-0102-0919-50-4\nKonfirmasi (WhatsApp) : 082228326870\n\nTerima kasih atas kepercayaan Anda kepada kami!`;
+    const message = `*BUKTI PESANAN*\n\nTerima kasih, pesanan Anda telah kami terima dengan rincian sebagai berikut:\n\nNama: *${formData.name}*\nNo. HP: *${formData.phone}*\nAlamat: *${formData.address}*\n\nDaftar Pesanan:\n${items.map(item => `- ${item.name} _${item.variantName}_ x ${item.qty} = Rp ${(item.price * item.qty).toLocaleString("id-ID")}`).join('\n')}\n\nTotal Harga: *Rp ${total.toLocaleString("id-ID")}*\n\nMohon lakukan pembayaran DP minimal 50% ke rekening berikut:\nBRI a/n: A. JAMIL HIDAYATULLAH\nNo. Rekening: 0582-0102-0919-50-4\nKonfirmasi (WhatsApp) : 082228326870\n\nTerima kasih atas kepercayaan Anda kepada kami!\n\n\n> *IKSADA STORE*`;
 
     try {
       const { data: orderData, error: orderError } = await supabase
