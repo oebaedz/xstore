@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination, EffectCoverflow } from "swiper/modules";
 import Countdown from "./newcomps/Countdown";
+import Logo from "../assets/HBH.png";
 
 import 'swiper/css';
 import 'swiper/css/pagination';
@@ -73,12 +74,12 @@ const NewHero = ({ banners = [], deadline, loading }) => {
         <div className="flex md:mt-2 flex-col md:flex-row items-center gap-12">
           
           {/* KOLOM KIRI: Text & Countdown */}
-          <div className="w-full md:w-1/2 text-center md:text-left order-1">
-            <div className="mb-6 hidden md:block animate-fade-in">
+          <div className="w-full md:w-1/2 text-center flex flex-col items-center md:items-start md:text-left order-1">
+            <div className="mb-6 animate-fade-in">
               <img 
-                src="https://i.postimg.cc/Y0ZKD30p/LOGO-NAMA-IKSADA-NEW.png" 
+                src={Logo}
                 alt="logo" 
-                className="h-12 animate-float" 
+                className="h-20 md:h-40 animate-float" 
               />
             </div>
 
@@ -87,7 +88,7 @@ const NewHero = ({ banners = [], deadline, loading }) => {
             </h1>
             
             <p className="text-white/80 text-sm md:text-lg mb-8 max-w-2xl font-body font-light">
-              Merchandise premium dengan sentuhan seni arsitektur Islam yang megah.
+              Merchandise premium dalam rangka Reuni dan Halal Bihalal ke-11, Ikatan Santri dan Alumni PP Darul Lughah Wal Karomah.
             </p>
 
             {/* Countdown sekarang diletakkan di bawah text agar layout seimbang */}

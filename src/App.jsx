@@ -1,7 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "./components/Home";
-import ReviewOrder from "./components/ReviewOrder";
-import OrdererInfo from "./components/OrdererInfo";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useEffect, useRef, useState } from "react";
 import { StoreContext } from "./StoreContext";
@@ -57,8 +55,6 @@ function App() {
           <Routes>
             <Route element={<RegLayout />}>
               <Route path="/" element={<Home />} />
-              <Route path="/review" element={<ReviewOrder />} />
-              <Route path="/checkout" element={<OrdererInfo />} />
               <Route path="*" element={<Navigate to="/" />} />
             </Route>
 
