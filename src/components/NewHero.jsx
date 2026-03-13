@@ -75,7 +75,7 @@ const NewHero = ({ banners = [], deadline, loading }) => {
           
           {/* KOLOM KIRI: Text & Countdown */}
           <div className="w-full md:w-1/2 text-center flex flex-col items-center md:items-start md:text-left order-1">
-            <div className="mb-6 animate-fade-in">
+            <div className="mb-3 md:mb-6 animate-fade-in">
               <img 
                 src={Logo}
                 alt="logo" 
@@ -87,12 +87,12 @@ const NewHero = ({ banners = [], deadline, loading }) => {
               Koleksi Eksklusif IKSADA
             </h1>
             
-            <p className="text-white/80 text-sm md:text-lg md:mb-8 max-w-2xl font-body font-light">
+            <p className="text-white/80 text-sm md:text-lg mb-6 md:mb-8 max-w-2xl font-body font-light">
               Merchandise premium dalam rangka Reuni dan Halal Bihalal ke-11, Ikatan Santri dan Alumni PP Darul Lughah Wal Karomah.
             </p>
 
             {/* Countdown sekarang diletakkan di bawah text agar layout seimbang */}
-            <div className="mt-10">
+            <div className="md:mt-10">
               <Countdown deadline={deadline} />
             </div>
           </div>

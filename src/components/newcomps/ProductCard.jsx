@@ -78,18 +78,19 @@ export default function ProductCard( { product, setIsCartOpen } ) {
         </h3>
 
         {/* Description */}
-        <p className="font-body text-xs md:text-sm text-gray-600 mb-2">
+        <p className="font-body text-[10px] md:text-lg text-gray-400 mb-2">
           {product.desc}
         </p>
 
         {/* Variant */}
+        <div className="font-light text-[10px] md:text-lg mb-2 md:mb-0 text-gray-500 font-body">Pilih Ukuran :</div>
         <div className="flex gap-2 flex-wrap">
           {product.variants.map((v) => (
             <label
               key={v.id}
               className={`
-                px-2 md:px-3 md:py-1
-                text-[10px] md:text-xs
+                px-3 py-1
+                text-[10px] md:text-sm
                 rounded-sm
                 font-body
                 transition
@@ -121,11 +122,11 @@ export default function ProductCard( { product, setIsCartOpen } ) {
         <button
           className="
             mt-4 w-full
-            bg-accent-green
-            hover:bg-accent-green-dark
+            bg-accent-green-dark
+            hover:bg-accent-green
             text-white
             text-sm md:text-xl
-            py-1 md:py-3
+            py-2 md:py-3
             rounded-sm
             font-body
             tracking-wide
