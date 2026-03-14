@@ -75,7 +75,7 @@ const NewHero = ({ banners = [], deadline, loading }) => {
           
           {/* KOLOM KIRI: Text & Countdown */}
           <div className="w-full md:w-1/2 text-center flex flex-col items-center md:items-start md:text-left order-1">
-            <div className="mb-3 md:mb-6 animate-fade-in">
+            <div className="mb-3 md:mb-6 max-[400px]:hidden animate-fade-in">
               <img 
                 src={Logo}
                 alt="logo" 

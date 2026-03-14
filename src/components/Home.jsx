@@ -96,7 +96,7 @@ const Home = () => {
               ))}
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-10">
+            <div className="grid grid-cols-2 max-[400px]:grid-cols-1 md:grid-cols-3 gap-2 md:gap-10">
               {filteredProducts.map((data) => {
                 return (
                   <div key={data.id}>
