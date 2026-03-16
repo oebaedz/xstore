@@ -23,7 +23,8 @@ const Home = () => {
           .from('products')
           .select('*')
           .order('category', { ascending: true })
-          .order('name', { ascending: true }),
+          .order('name', { ascending: true })
+          .eq('active', true),
         supabase.from('app_settings').select('*'),
       ]);
 
@@ -84,7 +85,7 @@ const Home = () => {
                 <button
                   key={f}
                   onClick={() => setFilterStatus(f)}
-                  className={`px-5 md:px-8 py-2 transition-all duration-300 ease-out rounded-full text-xs md:text-lg tracking-wider font-semibold whitespace-nowrap capitalize transition-all snap-start duration-300 border ${
+                  className={`px-5 md:px-8 py-2 ease-out rounded-full text-xs md:text-lg tracking-wider font-semibold whitespace-nowrap capitalize transition-all snap-start duration-300 border ${
                     filterStatus === f
                       ? 'bg-gradient-to-r ml-1 from-emerald-600 to-green-500 text-white shadow-lg scale-105 border-transparent'
                       : 'bg-white text-slate-600 border-slate-200 hover:border-emerald-400 hover:text-emerald-600'
