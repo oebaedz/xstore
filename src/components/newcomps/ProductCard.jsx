@@ -48,7 +48,7 @@ export default function ProductCard( { product, setIsCartOpen } ) {
       "
     >
       {/* Media */}
-      <div className="relative h-40 md:h-80 bg-muted bg-gradient-to-br to-[#064E3B] from-[#043027] p-4 relative">
+      <div className="relative h-40 md:h-80 bg-muted bg-gradient-to-br to-[#064E3B] from-[#043027] p-4">
         {/* Badge */}
         <div className="arabesque-pattern absolute inset-0 opacity-80"></div>
         <span
@@ -78,7 +78,7 @@ export default function ProductCard( { product, setIsCartOpen } ) {
         </h3>
 
         {/* Description */}
-        <p className="font-body text-[10px] md:text-lg text-gray-400 mb-2">
+        <p className="font-body font-light text-[10px] md:text-lg text-gray-500 mb-2">
           {product.desc}
         </p>
 

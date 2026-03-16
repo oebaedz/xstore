@@ -34,7 +34,7 @@ const CartSidebar = ({ isOpen, onClose, items, setItems, onCheckout }) => {
       }`}>
         
         {/* Header: Deep Emerald with Pattern */}
-        <div className="relative sticky top-0 bg-primary px-8 py-4 border-b-2 border-gold text-white overflow-hidden">
+        <div className="sticky top-0 bg-primary px-8 py-4 border-b-2 border-gold text-white overflow-hidden">
           <div className="arabesque-pattern absolute inset-0 opacity-80"></div>
           <div className="relative z-10 flex items-center justify-between">
             <div>
