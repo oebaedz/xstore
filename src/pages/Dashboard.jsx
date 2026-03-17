@@ -18,122 +18,140 @@ export default function Dashboard() {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isSendingWA, setIsSendingWA] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [inputBayar, setInputBayar] = useState(0);
+  const [inputBayar, setInputBayar] = useState('');
+
+  const formatRibuan = (value) => {
+    if (!value) return '';
+    // Hapus semua karakter selain angka
+    const numberString = value.toString().replace(/[^0-9]/g, '');
+    // Format menjadi ribuan dengan regex
+    return numberString.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  };
+
+  const parseAngkaRaw = (formattedValue) => {
+    // Ubah kembali "1.000.000" menjadi 1000000 (angka)
+    return parseInt(formattedValue.replace(/\./g, '')) || 0;
+  };
   
   // Buka Modal & Set Order yang Dipilih
   const openPaymentModal = (order) => {
     setSelectedOrder(order);
-    setInputBayar(order.dibayar || 0);
+    setInputBayar(formatRibuan(order.dibayar || 0));
     setIsModalOpen(true);
   };
   
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedOrder(null);
-    setInputBayar(0);
+    setInputBayar('');
   };
+
+  const handleInputChange = (e) => {
+    const rawValue = e.target.value;
+    setInputBayar(formatRibuan(rawValue));
+  }
   
-    // State untuk modal detail order
-    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-    const [detailOrder, setDetailOrder] = useState(null);
+  // State untuk modal detail order
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [detailOrder, setDetailOrder] = useState(null);
 
-    // Buka Modal Detail Order
-    const openDetailModal = (order) => {
-      setDetailOrder(order);
-      setIsDetailModalOpen(true);
-    };
+  // Buka Modal Detail Order
+  const openDetailModal = (order) => {
+    setDetailOrder(order);
+    setIsDetailModalOpen(true);
+  };
 
-    // Tutup Modal Detail Order
-    const closeDetailModal = () => {
-      setIsDetailModalOpen(false);
-      setDetailOrder(null);
-    };
+  // Tutup Modal Detail Order
+  const closeDetailModal = () => {
+    setIsDetailModalOpen(false);
+    setDetailOrder(null);
+  };
 
-    // Fungsi Detail Order Modal
-    const OrderDetailModal = () => {
-      return (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          {/* Backdrop */}
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={closeDetailModal} />
+  // Fungsi Detail Order Modal
+  const OrderDetailModal = () => {
+    return (
+      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+        {/* Backdrop */}
+        <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={closeDetailModal} />
 
-          {/* Sheet/Modal Content */}
-          <div className="relative bg-white w-full max-w-lg rounded-t-[40px] sm:rounded-[40px] p-8 shadow-2xl animate-in slide-in-from-bottom-10 duration-300">
-            
-            {/* Handle Bar (Hanya untuk feel mobile) */}
-            <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-8 sm:hidden" />
+        {/* Sheet/Modal Content */}
+        <div className="relative bg-white w-full max-w-lg rounded-t-[40px] sm:rounded-[40px] p-8 shadow-2xl animate-in slide-in-from-bottom-10 duration-300">
+          
+          {/* Handle Bar (Hanya untuk feel mobile) */}
+          <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-8 sm:hidden" />
 
-            <div className="flex justify-between items-start mb-6">
-              <div>
-                <h3 className="text-xl font-black text-slate-800 leading-none mb-2">{detailOrder?.nama}</h3>
-                <span className="text-[10px] text-slate-400 uppercase tracking-wider">{detailOrder?.alamat}</span>
-              </div>
-              <button onClick={closeDetailModal} className="p-2 bg-slate-100 rounded-full text-slate-400">
-                <X size={20} />
-              </button>
+          <div className="flex justify-between items-start mb-6">
+            <div>
+              <h3 className="text-xl font-black text-slate-800 leading-none mb-2">{detailOrder?.nama}</h3>
+              <span className="text-[10px] text-slate-400 uppercase tracking-wider">{detailOrder?.alamat}</span>
             </div>
+            <button onClick={closeDetailModal} className="p-2 bg-slate-100 rounded-full text-slate-400">
+              <X size={20} />
+            </button>
+          </div>
 
-            {/* LIST PRODUK */}
-            <div className="space-y-4 mb-8 max-h-[40vh] overflow-y-auto no-scrollbar">
-              {detailOrder?.order_items.map((item, idx) => (
-                <div key={idx} className="flex justify-between items-center p-4 bg-slate-50 rounded-3xl border border-slate-100">
-                  <div className="flex-1">
-                    <h4 className="font-bold text-sm text-slate-800">{item.products.name}</h4>
-                    <p className="text-[10px] font-black text-emerald-600 uppercase">{item.variantName}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs font-bold text-slate-400">{item.qty}x</p>
-                    <p className="text-sm font-black text-slate-800">Rp {(item.price * item.qty).toLocaleString()}</p>
-                  </div>
+          {/* LIST PRODUK */}
+          <div className="space-y-4 mb-8 max-h-[40vh] overflow-y-auto no-scrollbar">
+            {detailOrder?.order_items.map((item, idx) => (
+              <div key={idx} className="flex justify-between items-center p-4 bg-slate-50 rounded-3xl border border-slate-100">
+                <div className="flex-1">
+                  <h4 className="font-bold text-sm text-slate-800">{item.products.name}</h4>
+                  <p className="text-[10px] font-black text-emerald-600 uppercase">{item.variantName}</p>
                 </div>
-              ))}
+                <div className="text-right">
+                  <p className="text-xs font-bold text-slate-400">{item.qty}x</p>
+                  <p className="text-sm font-black text-slate-800">Rp {(item.price * item.qty).toLocaleString()}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* SUMMARY RINGKAS */}
+          <div className="border-t border-dashed border-slate-200 pt-6 space-y-2">
+            <div className="flex justify-between text-sm font-bold">
+              <span className="text-slate-400">Total Tagihan</span>
+              <span className="text-slate-800">Rp {detailOrder?.total_harga.toLocaleString()}</span>
             </div>
-
-            {/* SUMMARY RINGKAS */}
-            <div className="border-t border-dashed border-slate-200 pt-6 space-y-2">
-              <div className="flex justify-between text-sm font-bold">
-                <span className="text-slate-400">Total Tagihan</span>
-                <span className="text-slate-800">Rp {detailOrder?.total_harga.toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between text-sm font-bold">
-                <span className="text-slate-400">Sudah Dibayar</span>
-                <span className="text-emerald-500">Rp {detailOrder?.dibayar.toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between text-lg font-black pt-2 border-t border-slate-100">
-                <span className="text-slate-800 uppercase text-xs self-center">Belum Dibayar</span>
-                <span className="text-rose-500">Rp {(detailOrder?.total_harga - detailOrder?.dibayar).toLocaleString()}</span>
-              </div>
+            <div className="flex justify-between text-sm font-bold">
+              <span className="text-slate-400">Sudah Dibayar</span>
+              <span className="text-emerald-500">Rp {detailOrder?.dibayar.toLocaleString()}</span>
             </div>
-
-            {detailOrder?.status !== 'lunas' && (
-             <button 
-               onClick={() => {
-                 closeDetailModal(); // Tutup detail dulu
-                 openPaymentModal(detailOrder); // Baru buka bayar
-               }}
-               className="w-full mt-2 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-xs font-black uppercase tracking-wider border border-emerald-100"
-             >
-               Klik untuk Bayar
-             </button>
-           )}
-
-            {/* ACTION BUTTONS */}
-            <div className="grid grid-cols-2 gap-3 mt-8">
-              <button className="py-4 bg-slate-100 text-slate-600 rounded-2xl font-black uppercase text-[10px] tracking-widest">
-                Print Struk
-              </button>
-              <button
-                onClick={() => {openConfirmModal(detailOrder);}} 
-                className="py-4 bg-emerald-600 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-emerald-100">
-                Kirim Nota WA
-              </button>
+            <div className="flex justify-between text-lg font-black pt-2 border-t border-slate-100">
+              <span className="text-slate-800 uppercase text-xs self-center">Belum Dibayar</span>
+              <span className="text-rose-500">Rp {(detailOrder?.total_harga - detailOrder?.dibayar).toLocaleString()}</span>
             </div>
           </div>
+
+          {detailOrder?.status !== 'lunas' && (
+            <button 
+              onClick={() => {
+                closeDetailModal(); // Tutup detail dulu
+                openPaymentModal(detailOrder); // Baru buka bayar
+              }}
+              className="w-full mt-2 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-xs font-black uppercase tracking-wider border border-emerald-100"
+            >
+              Klik untuk Bayar
+            </button>
+          )}
+
+          {/* ACTION BUTTONS */}
+          <div className="grid grid-cols-2 gap-3 mt-8">
+            <button className="py-4 bg-slate-100 text-slate-600 rounded-2xl font-black uppercase text-[10px] tracking-widest">
+              Print Struk
+            </button>
+            <button
+              onClick={() => {openConfirmModal(detailOrder);}} 
+              className="py-4 bg-emerald-600 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-emerald-100">
+              Kirim Nota WA
+            </button>
+          </div>
         </div>
-      );
-    };
+      </div>
+    );
+  };
 
   const handleUpdateBayar = async () => {
-    const nominalBayar = parseInt(inputBayar);
+    const nominalBayar = parseAngkaRaw(inputBayar);
     if (isNaN(nominalBayar) || nominalBayar < 0) {
       showToast('Masukkan nominal yang valid', 'error');
       return;
@@ -238,7 +256,6 @@ export default function Dashboard() {
             {/* Info Pelanggan */}
             <div className="flex-1">
               <h3 className="font-bold text-slate-800 leading-none mb-1">{order.nama}</h3>
-              <p className="text-[10px] text-slate-400 mb-2">{order.no_hp}</p>
               
               {/* Badge Status Otomatis */}
               <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
@@ -298,9 +315,10 @@ export default function Dashboard() {
               <div>
                 <label className="text-xs font-bold text-slate-400 uppercase">Nominal Bayar (Rp)</label>
                 <input 
-                  type="number"
+                  type="text"
+                  inputMode='numeric'
                   value={inputBayar}
-                  onChange={(e) => setInputBayar(e.target.value)}
+                  onChange={handleInputChange}
                   className="w-full text-2xl bg-slate-50 font-black text-green-700 border-b-2 border-slate-100 focus:border-green-700 outline-none py-2"
                   autoFocus
                 />
@@ -308,7 +326,7 @@ export default function Dashboard() {
 
               {/* Shortcut Button */}
               <button 
-                onClick={() => setInputBayar(selectedOrder.total_harga)}
+                onClick={() => setInputBayar(formatRibuan(selectedOrder.total_harga))}
                 className="w-full py-2 bg-slate-50 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-100 border border-dashed border-slate-200"
               >
                 Set Lunas (Rp {selectedOrder?.total_harga?.toLocaleString('id-ID')})
