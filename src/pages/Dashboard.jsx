@@ -16,19 +16,104 @@ export default function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [inputBayar, setInputBayar] = useState(0);
-
+  
   // Buka Modal & Set Order yang Dipilih
   const openPaymentModal = (order) => {
     setSelectedOrder(order);
     setInputBayar(order.dibayar || 0);
     setIsModalOpen(true);
   };
-
+  
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedOrder(null);
     setInputBayar(0);
   };
+  
+    // State untuk modal detail order
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+    const [detailOrder, setDetailOrder] = useState(null);
+
+    // Buka Modal Detail Order
+    const openDetailModal = (order) => {
+      setDetailOrder(order);
+      setIsDetailModalOpen(true);
+    };
+
+    // Tutup Modal Detail Order
+    const closeDetailModal = () => {
+      setIsDetailModalOpen(false);
+      setDetailOrder(null);
+    };
+
+    // Fungsi Detail Order Modal
+    const OrderDetailModal = () => {
+      return (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={closeDetailModal} />
+
+          {/* Sheet/Modal Content */}
+          <div className="relative bg-white w-full max-w-lg rounded-t-[40px] sm:rounded-[40px] p-8 shadow-2xl animate-in slide-in-from-bottom-10 duration-300">
+            
+            {/* Handle Bar (Hanya untuk feel mobile) */}
+            <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-8 sm:hidden" />
+
+            <div className="flex justify-between items-start mb-6">
+              <div>
+                <h3 className="text-xl font-black text-slate-800 leading-none mb-2">{detailOrder?.nama}</h3>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">ID: {detailOrder?.id.substring(0, 8)}</span>
+              </div>
+              <button onClick={closeDetailModal} className="p-2 bg-slate-100 rounded-full text-slate-400">
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* LIST PRODUK */}
+            <div className="space-y-4 mb-8 max-h-[40vh] overflow-y-auto no-scrollbar">
+              {detailOrder?.order_items.map((item, idx) => (
+                <div key={idx} className="flex justify-between items-center p-4 bg-slate-50 rounded-3xl border border-slate-100">
+                  <div className="flex-1">
+                    <h4 className="font-bold text-sm text-slate-800">{item.products.name}</h4>
+                    <p className="text-[10px] font-black text-emerald-600 uppercase">{item.variantName}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs font-bold text-slate-400">{item.qty}x</p>
+                    <p className="text-sm font-black text-slate-800">Rp {(item.price * item.qty).toLocaleString()}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* SUMMARY RINGKAS */}
+            <div className="border-t border-dashed border-slate-200 pt-6 space-y-2">
+              <div className="flex justify-between text-sm font-bold">
+                <span className="text-slate-400">Total Tagihan</span>
+                <span className="text-slate-800">Rp {detailOrder?.total_harga.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between text-sm font-bold">
+                <span className="text-slate-400">Sudah Dibayar</span>
+                <span className="text-emerald-500">Rp {detailOrder?.dibayar.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between text-lg font-black pt-2 border-t border-slate-100">
+                <span className="text-slate-800 uppercase text-xs self-center">Sisa</span>
+                <span className="text-rose-500">Rp {(detailOrder?.total_harga - detailOrder?.dibayar).toLocaleString()}</span>
+              </div>
+            </div>
+
+            {/* ACTION BUTTONS */}
+            <div className="grid grid-cols-2 gap-3 mt-8">
+              <button className="py-4 bg-slate-100 text-slate-600 rounded-2xl font-black uppercase text-[10px] tracking-widest">
+                Print Struk
+              </button>
+              <button className="py-4 bg-emerald-600 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-emerald-100">
+                Kirim Nota WA
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    };
 
   const handleUpdateBayar = async () => {
     const nominalBayar = parseInt(inputBayar);
@@ -97,16 +182,6 @@ export default function Dashboard() {
     <div className="p-4 md:p-8 bg-slate-50 min-h-screen pb-10">
       <h1 className="text-xl md:text-2xl font-bold mb-6 text-slate-800">Manajemen Pesanan</h1>
 
-      {/* --- SUMMARY BOARD ---
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        {rekap.map((item, idx) => (
-          <div key={idx} className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 text-center">
-            <p className="text-xs text-slate-500 uppercase font-bold">{item.variant_lengan} - {item.variant_size}</p>
-            <p className="text-2xl font-black text-blue-600">{item.total_pcs} <span className="text-sm font-normal text-slate-400">pcs</span></p>
-          </div>
-        ))}
-      </div> */}
-
       {/* Search Bar */}
       <input 
         type="text"
@@ -135,7 +210,7 @@ export default function Dashboard() {
 
       <div className="flex flex-col gap-3">
         {filteredOrders.map((order) => (
-          <div key={order.id} className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+          <div key={order.id} className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between" onClick={() => openDetailModal(order)}>
             {/* Info Pelanggan */}
             <div className="flex-1">
               <h3 className="font-bold text-slate-800 leading-none mb-1">{order.nama}</h3>
@@ -175,6 +250,9 @@ export default function Dashboard() {
           </div>
         ))}
       </div>
+
+      {/* --- MODAL DETAIL PESANAN --- */}
+      {isDetailModalOpen && <OrderDetailModal />}
 
       {/* --- MODAL PEMBAYARAN --- */}
       {isModalOpen && (

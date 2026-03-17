@@ -24,9 +24,27 @@ const AdminLayout = ({ children }) => {
       setLoading(true);
       // Kita ambil data secara paralel agar cepat
       const [prodRes, orderItemsRes, orderRes, appSettingsRes] = await Promise.all([
-        supabase.from('products').select('*').order('category', { ascending: true }).order('name', { ascending: true }),
+        supabase.from('products')
+          .select('*')
+          .order('category', { ascending: true })
+          .order('name', { ascending: true }),
         supabase.from('order_items').select('*').order('product_id', { ascending: false }),
-        supabase.from('orders').select('*').order('created_at', { ascending: false }),
+        supabase.from('orders')
+          .select(`
+            *,
+            order_items (
+              id,
+              qty,
+              variant_id,
+              price,
+              products (
+                name,
+                category,
+                variants
+              )
+            )
+          `)
+          .order('created_at', { ascending: false }),
         supabase.from('app_settings').select('*')
       ]);
 
@@ -35,9 +53,20 @@ const AdminLayout = ({ children }) => {
       if (orderRes.error) throw orderRes.error;
       if (appSettingsRes.error) throw appSettingsRes.error;
 
+      if (orderRes.data) {
+        const ordersWithVariant = orderRes.data.map(order => ({
+          ...order,
+          order_items: order.order_items.map(item => ({
+            ...item,
+            // Cari nama varian yang cocok
+            variantName: item.products.variants.find(v => v.id === item.variant_id).name || null
+          }))
+        }));
+        setOrders(ordersWithVariant);
+      }
+
       setProducts(prodRes.data || []);
       setOrderItems(orderItemsRes.data || []);
-      setOrders(orderRes.data || []);
       setAppSettings(appSettingsRes.data || []);
     } catch (error) {
       console.error('Error fetching admin data:', error);
