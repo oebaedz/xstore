@@ -4,6 +4,7 @@ import supabase from '../components/createClient';
 import sendWhatsApp from '../context/sendWhatsApp';
 import { useToast } from '../context/ToastContext';
 import { MessageCircle, X, Check  } from 'lucide-react';
+import ConfirmModal from '../components/ConfirmModal';
 
 
 export default function Dashboard() {
@@ -14,6 +15,8 @@ export default function Dashboard() {
 
   //State untuk modal
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isSendingWA, setIsSendingWA] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [inputBayar, setInputBayar] = useState(0);
   
@@ -62,7 +65,7 @@ export default function Dashboard() {
             <div className="flex justify-between items-start mb-6">
               <div>
                 <h3 className="text-xl font-black text-slate-800 leading-none mb-2">{detailOrder?.nama}</h3>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">ID: {detailOrder?.id.substring(0, 8)}</span>
+                <span className="text-[10px] text-slate-400 uppercase tracking-wider">{detailOrder?.alamat}</span>
               </div>
               <button onClick={closeDetailModal} className="p-2 bg-slate-100 rounded-full text-slate-400">
                 <X size={20} />
@@ -96,17 +99,31 @@ export default function Dashboard() {
                 <span className="text-emerald-500">Rp {detailOrder?.dibayar.toLocaleString()}</span>
               </div>
               <div className="flex justify-between text-lg font-black pt-2 border-t border-slate-100">
-                <span className="text-slate-800 uppercase text-xs self-center">Sisa</span>
+                <span className="text-slate-800 uppercase text-xs self-center">Belum Dibayar</span>
                 <span className="text-rose-500">Rp {(detailOrder?.total_harga - detailOrder?.dibayar).toLocaleString()}</span>
               </div>
             </div>
+
+            {detailOrder?.status !== 'lunas' && (
+             <button 
+               onClick={() => {
+                 closeDetailModal(); // Tutup detail dulu
+                 openPaymentModal(detailOrder); // Baru buka bayar
+               }}
+               className="w-full mt-2 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-xs font-black uppercase tracking-wider border border-emerald-100"
+             >
+               Klik untuk Bayar
+             </button>
+           )}
 
             {/* ACTION BUTTONS */}
             <div className="grid grid-cols-2 gap-3 mt-8">
               <button className="py-4 bg-slate-100 text-slate-600 rounded-2xl font-black uppercase text-[10px] tracking-widest">
                 Print Struk
               </button>
-              <button className="py-4 bg-emerald-600 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-emerald-100">
+              <button
+                onClick={() => {openConfirmModal(detailOrder);}} 
+                className="py-4 bg-emerald-600 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-emerald-100">
                 Kirim Nota WA
               </button>
             </div>
@@ -156,30 +173,37 @@ export default function Dashboard() {
     return matchesSearch && matchStatus;
   })
 
+  const openConfirmModal = (order) => {
+    setSelectedOrder(order);
+    setIsConfirmOpen(true);
+  }
+
   const handleKirimWA = (order) => {
     let pesan = "";
     
     if (order.status === 'dp') {
-      pesan = `Halo *${order.nama}*,\nPembayaran DP Anda telah kami terima. Pesanan Anda kini masuk antrean produksi.\n\nTerima kasih! 🙏`;
+      pesan = `Halo *${order.nama}*,\n\nPembayaran DP Anda telah kami terima. Pesanan Anda kini masuk antrean produksi.\n\nTerima kasih! 🙏`;
     } else if (order.status === 'lunas') {
-      pesan = `Kabar gembira *${order.nama}*!\nKami telah menerima pembayaran lunas Anda. Pesanan Anda sedang dalam proses produksi. Terima kasih atas kepercayaan Anda! 😊`;
+      pesan = `Kabar gembira *${order.nama}*!\n\nKami telah menerima pembayaran lunas Anda. Pesanan Anda sedang dalam proses produksi. Terima kasih atas kepercayaan Anda! 😊`;
     } else {
-      pesan = `Halo *${order.nama}*,\nKami ingin mengingatkan bahwa pembayaran untuk pesanan Anda belum kami terima. Mohon segera lakukan pembayaran agar pesanan Anda bisa segera diproses. Terima kasih! 🙏`;
+      pesan = `Halo *${order.nama}*,\n\nKami ingin mengingatkan bahwa pembayaran untuk pesanan Anda belum kami terima. Mohon segera lakukan pembayaran agar pesanan Anda bisa segera diproses. Terima kasih! 🙏`;
     }
 
     if (!pesan) return;
-
-    // Tampilkan konfirmasi terakhir sebelum benar-benar kirim
-    const konfirmasi = window.confirm(`Kirim notifikasi WA ke ${order.nama}?`);
-    
-    if (konfirmasi) {
-      sendWhatsApp(order.no_hp, pesan);
-      showToast('Notifikasi WA telah dikirim.', 'success');
-    }
+    sendWhatsApp(order.no_hp, pesan);
+    showToast('Notifikasi WA telah dikirim.', 'success');
   };
 
   return (
     <div className="p-4 md:p-8 bg-slate-50 min-h-screen pb-10">
+      <ConfirmModal
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={handleKirimWA}
+        title={`Kirim Pesan WA?`}
+        message={`Apakah Anda yakin ingin mengirim pesan WA ke ${selectedOrder?.nama}?`}
+        isLoading={isSendingWA}
+      />
       <h1 className="text-xl md:text-2xl font-bold mb-6 text-slate-800">Manajemen Pesanan</h1>
 
       {/* Search Bar */}
@@ -227,7 +251,7 @@ export default function Dashboard() {
 
             {/* Kolom Harga & Bayar (Clickable) */}
             <div 
-              onClick={() => openPaymentModal(order)}
+              // onClick={() => openPaymentModal(order)}
               className="flex flex-col items-end px-4 cursor-pointer active:scale-95 transition-transform"
             >
               <p className="text-[10px] text-slate-400 leading-none">Dibayar / Total</p>
@@ -242,7 +266,7 @@ export default function Dashboard() {
 
             {/* Tombol WA */}
             <button 
-              onClick={() => handleKirimWA(order)}
+              onClick={(e) => { e.stopPropagation(); openConfirmModal(order); }}
               className="w-10 h-10 bg-emerald-500 flex items-center justify-center rounded-xl text-white shadow-lg shadow-emerald-200 active:scale-90 transition-all"
             >
               <MessageCircle size={20} />

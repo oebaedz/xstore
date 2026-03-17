@@ -3,6 +3,8 @@ import { AlertTriangle, X } from 'lucide-react';
 const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message, isLoading }) => {
   if (!isOpen) return null;
 
+  const color = title === 'Hapus Produk?' ? 'red' : 'emerald';
+
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
       {/* Backdrop/Overlay */}
@@ -21,8 +23,8 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message, isLoading })
         </button>
 
         <div className="flex flex-col items-center text-center">
-          <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-6">
-            <AlertTriangle className="text-red-500 w-8 h-8" />
+          <div className={`w-16 h-16 bg-${color}-50 rounded-full flex items-center justify-center mb-6`}>
+            <AlertTriangle className={`text-${color}-500 w-8 h-8`} />
           </div>
 
           <h3 className="text-xl font-bold text-slate-800 mb-2">{title}</h3>
@@ -40,9 +42,9 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message, isLoading })
             <button
               onClick={onConfirm}
               disabled={isLoading}
-              className="flex-1 py-3 px-4 bg-red-500 hover:bg-red-600 text-white font-bold rounded-2xl shadow-lg shadow-red-200 transition-all disabled:opacity-50"
+              className={`flex-1 py-3 px-4 bg-${color}-500 hover:bg-${color}-600 text-white font-bold rounded-2xl shadow-lg shadow-${color}-200 transition-all disabled:opacity-50`}
             >
-              {isLoading ? 'Menghapus...' : 'Ya, Hapus'}
+              {isLoading ? 'Memproses...' : 'Ya'}
             </button>
           </div>
         </div>
