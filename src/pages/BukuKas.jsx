@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Plus, ArrowUpCircle, ArrowDownCircle, Wallet, Filter } from 'lucide-react';
+import { Plus, ArrowUpCircle, ArrowDownCircle, Wallet, Filter, Trash2, Loader } from 'lucide-react';
 import { useOutletContext } from 'react-router-dom';
 import supabase from '../components/createClient';
 import {useToast} from '../context/ToastContext'
@@ -36,6 +36,18 @@ const BukuKas = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // VALIDASI
+    if(!formData.amount || parseFloat(formData.amount) <= 0) {
+      showToast('Masukkan jumlah nominal yang valid', 'error')
+      return
+    }
+
+    if(!formData.description.trim()) {
+      showToast('Deskripsi tidak boleh kosong', 'error')
+      return
+    }
+
     try {
       setIsLoading(true);
       const { error } = await supabase
@@ -49,6 +61,10 @@ const BukuKas = () => {
 
       if (error) throw error;
 
+      showToast('Transaksi berhasil ditambahkan!', 'success');
+      await refreshData();
+      setIsModalOpen(false)
+      
       // Reset form and refresh data
       setFormData({
         type: 'keluar',
@@ -56,12 +72,56 @@ const BukuKas = () => {
         amount: '',
         description: '',
       });
-
-      showToast('Transaksi berhasil ditambahkan!', 'success');
-      await refreshData();
     } catch (error) {
       console.error('Error submitting transaction:', error);
       showToast('Gagal menambahkan transaksi.', 'error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDelete = async (t) => {
+    const confirmDelete = window.confirm("Hapus transaksi ini? Saldo kas akan berubah.");
+    if (!confirmDelete) return;
+
+    try {
+      setIsLoading(true);
+
+      // 1. Jika transaksi terkait dengan ORDER, kurangi nilai 'dibayar' di order tersebut
+      if (t.order_id) {
+        // Ambil data order terbaru untuk mendapatkan nilai 'dibayar' saat ini
+        const { data: currentOrder } = await supabase
+          .from('orders')
+          .select('dibayar, total_harga')
+          .eq('id', t.order_id)
+          .single();
+
+        if (currentOrder) {
+          const nominalBaru = Math.max(0, currentOrder.dibayar - t.amount);
+          let statusBaru = 'dp';
+          if (nominalBaru === 0) statusBaru = 'belum';
+          if (nominalBaru >= currentOrder.total_harga) statusBaru = 'lunas';
+
+          await supabase
+            .from('orders')
+            .update({ dibayar: nominalBaru, status: statusBaru })
+            .eq('id', t.order_id);
+        }
+      }
+
+      // 2. Hapus transaksi dari tabel transactions
+      const { error } = await supabase
+        .from('transactions')
+        .delete()
+        .eq('id', t.id);
+
+      if (error) throw error;
+
+      showToast('Transaksi berhasil dihapus', 'success');
+      await refreshData();
+    } catch (error) {
+      console.error(error);
+      showToast('Gagal menghapus transaksi', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -153,6 +213,7 @@ const BukuKas = () => {
                 </label>
                 <input
                   type="number"
+                  min='0'
                   value={formData.amount}
                   onChange={(e) => setFormData({...formData, amount: e.target.value})}
                   placeholder="0"
@@ -247,13 +308,29 @@ const BukuKas = () => {
                   <p className="text-[10px] text-slate-400 font-medium">{t.description}</p>
                 </div>
               </div>
-              <div className="text-right">
-                <p className={`font-black text-sm ${t.type === 'masuk' ? 'text-emerald-600' : 'text-rose-600'}`}>
-                  {t.type === 'masuk' ? '+' : '-'} {t.amount.toLocaleString()}
-                </p>
-                <p className="text-[9px] font-bold text-slate-300 uppercase">
-                  {new Date(t.created_at).toLocaleDateString('id-ID', { hour: '2-digit', minute: '2-digit' })}
-                </p>
+              <div className="flex items-center gap-4">
+                <div className="text-right">
+                  <p className={`font-black text-sm ${t.type === 'masuk' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                    {t.type === 'masuk' ? '+' : '-'} {t.amount.toLocaleString()}
+                  </p>
+                  <p className="text-[9px] font-bold text-slate-300 uppercase">
+                    {new Date(t.created_at).toLocaleTimeString('id-ID', { 
+                      day: '2-digit', 
+                      month: '2-digit', 
+                      year: 'numeric', 
+                      hour: '2-digit', 
+                      minute: '2-digit' })}
+                  </p>
+                </div>
+                
+                {/* Tombol Hapus - Muncul saat di-hover (di desktop) atau terlihat di mobile */}
+                <button 
+                  onClick={() => handleDelete(t)}
+                  disabled={isLoading}
+                  className={`p-0 text-rose-500 md:text-slate-300 hover:text-rose-500 transition-colors`}
+                >
+                  { !isLoading ? <Trash2 size={14} /> : <Loader size={14} /> }
+                </button>
               </div>
             </div>
           ))}
@@ -263,7 +340,7 @@ const BukuKas = () => {
       {/* --- FLOATING ACTION BUTTON (Untuk Input Manual) --- */}
       <button 
         onClick={() => setIsModalOpen(true)}
-        className="fixed bottom-24 right-6 w-14 h-14 bg-emerald-600 text-white rounded-2xl shadow-xl shadow-indigo-200 flex items-center justify-center hover:scale-110 active:scale-95 transition-all">
+        className="fixed bottom-24 right-6 w-14 h-14 bg-emerald-600 text-white rounded-2xl shadow-xl shadow-emerald-200 flex items-center justify-center hover:scale-110 active:scale-95 transition-all">
         <Plus size={28} strokeWidth={3} />
       </button>
     </div>

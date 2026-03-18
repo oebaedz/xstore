@@ -308,7 +308,7 @@ export default function Dashboard() {
     }
 
     if (!pesan) return;
-    await  sendWhatsApp('085320561697', pesan);
+    await  sendWhatsApp(order.no_hp, pesan);
     showToast('Notifikasi WA telah dikirim.', 'success');
   };
 
