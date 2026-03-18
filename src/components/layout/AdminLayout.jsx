@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { LayoutDashboard, Package, ShoppingCart, Menu, LogOut, SettingsIcon, FilesIcon } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, Menu, LogOut, SettingsIcon, FilesIcon, Wallet } from 'lucide-react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import supabase from '../createClient'
 
@@ -9,6 +9,7 @@ const AdminLayout = ({ children }) => {
   const [orders, setOrders] = useState([]);
   const [orderItems, setOrderItems] = useState([]);
   const [appSettings, setAppSettings] = useState([]);
+  const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -17,13 +18,14 @@ const AdminLayout = ({ children }) => {
     { name: 'Produk', icon: <Package size={20} />, path: '/products' },
     { name: 'Pesanan', icon: <ShoppingCart size={20} />, path: '/orders' },
     { name: 'Rekap', icon: <FilesIcon size={20} />, path: '/recap' },
+    { name: 'Buku Kas', icon: <Wallet size={20} />, path: '/cash' },
     { name: 'Pengaturan', icon: <SettingsIcon size={20} />, path: '/settings' },
   ];
   const fetchAdminData = useCallback(async () => {
     try {
       setLoading(true);
       // Kita ambil data secara paralel agar cepat
-      const [prodRes, orderItemsRes, orderRes, appSettingsRes] = await Promise.all([
+      const [prodRes, orderItemsRes, orderRes, appSettingsRes, transRes] = await Promise.all([
         supabase.from('products')
           .select('*')
           .order('category', { ascending: true })
@@ -45,13 +47,15 @@ const AdminLayout = ({ children }) => {
             )
           `)
           .order('created_at', { ascending: false }),
-        supabase.from('app_settings').select('*')
+        supabase.from('app_settings').select('*'),
+        supabase.from('transactions').select('*').order('created_at', { ascending: false })
       ]);
 
       if (prodRes.error) throw prodRes.error;
       if (orderItemsRes.error) throw orderItemsRes.error;
       if (orderRes.error) throw orderRes.error;
       if (appSettingsRes.error) throw appSettingsRes.error;
+      if (transRes.error) throw transRes.error;
 
       if (orderRes.data) {
         const ordersWithVariant = orderRes.data.map(order => ({
@@ -68,6 +72,7 @@ const AdminLayout = ({ children }) => {
       setProducts(prodRes.data || []);
       setOrderItems(orderItemsRes.data || []);
       setAppSettings(appSettingsRes.data || []);
+      setTransactions(transRes.data || []);
     } catch (error) {
       console.error('Error fetching admin data:', error);
     } finally {
@@ -127,7 +132,7 @@ const AdminLayout = ({ children }) => {
 
       {/* MAIN CONTENT */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 bg-white border-b border-slate-100 flex items-center justify-between px-4 lg:px-8">
+        <header className="sticky top-0 z-50 h-16 bg-white border-b border-slate-100 flex items-center justify-between px-4 lg:px-8">
           <div className="flex items-center gap-3">
             <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-2 text-slate-600">
               <Menu size={24} />
@@ -152,8 +157,11 @@ const AdminLayout = ({ children }) => {
           {loading && (
             <div className="h-1 bg-emerald-500 animate-pulse w-full fixed top-16 z-[60]" />
           )}
-          <Outlet context={{ products, orders, orderItems, appSettings, refreshData: fetchAdminData }} />
+          <Outlet context={{ products, orders, orderItems, appSettings, transactions, refreshData: fetchAdminData }} />
         </main>
+        <footer className="p-8 pt-16 text-center text-slate-400 text-xs">
+          &copy; 2026 IXADA Store. All rights reserved.
+        </footer>
       </div>
     </div>
   );

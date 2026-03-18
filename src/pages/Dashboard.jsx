@@ -3,7 +3,7 @@ import { useOutletContext } from 'react-router-dom';
 import supabase from '../components/createClient';
 import sendWhatsApp from '../context/sendWhatsApp';
 import { useToast } from '../context/ToastContext';
-import { MessageCircle, X, Check  } from 'lucide-react';
+import { MessageCircle, X, Check, Trash2  } from 'lucide-react';
 import ConfirmModal from '../components/ConfirmModal';
 
 
@@ -15,10 +15,15 @@ export default function Dashboard() {
 
   //State untuk modal
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const [isSendingWA, setIsSendingWA] = useState(false);
+  const [isConfirmLoading, setIsConfirmLoading] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [inputBayar, setInputBayar] = useState('');
+  const [confirmConfig, setConfirmConfig] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: null,
+  });
 
   const formatRibuan = (value) => {
     if (!value) return '';
@@ -96,7 +101,10 @@ export default function Dashboard() {
               <div key={idx} className="flex justify-between items-center p-4 bg-slate-50 rounded-3xl border border-slate-100">
                 <div className="flex-1">
                   <h4 className="font-bold text-sm text-slate-800">{item.products.name}</h4>
-                  <p className="text-[10px] font-black text-emerald-600 uppercase">{item.variantName}</p>
+                  <div className="flex gap-2">
+                    <p className="text-[10px] font-black text-blue-400 uppercase">{item.products.category}</p>
+                    <p className="text-[10px] font-black text-emerald-600 uppercase">{item.variantName}</p>
+                  </div>
                 </div>
                 <div className="text-right">
                   <p className="text-xs font-bold text-slate-400">{item.qty}x</p>
@@ -112,9 +120,28 @@ export default function Dashboard() {
               <span className="text-slate-400">Total Tagihan</span>
               <span className="text-slate-800">Rp {detailOrder?.total_harga.toLocaleString()}</span>
             </div>
-            <div className="flex justify-between text-sm font-bold">
+            {/* ... di dalam Summary Ringkas ... */}
+            <div className="flex justify-between text-sm font-bold items-center">
               <span className="text-slate-400">Sudah Dibayar</span>
-              <span className="text-emerald-500">Rp {detailOrder?.dibayar.toLocaleString()}</span>
+              <div className="flex items-center gap-2">
+                {/* Tombol Hapus/Reset - Hanya muncul jika sudah ada pembayaran */}
+                {detailOrder?.dibayar > 0 && (
+                  <button 
+                    onClick={() => {
+                      openConfirm({
+                        title: 'Reset Pembayaran?',
+                        message: 'Apakah Anda yakin ingin mereset pembayaran untuk pesanan ' + detailOrder?.nama + '? Tindakan ini tidak dapat dibatalkan.',
+                        onConfirm: () => handleResetPembayaran(detailOrder),
+                      });
+                    }}
+                    className="p-1.5 bg-rose-50 text-rose-500 rounded-lg hover:bg-rose-100 transition-colors"
+                    title="Hapus Pembayaran"
+                  >
+                    <Trash2 size={14} /> 
+                  </button>
+                )}
+                <span className="text-emerald-500">Rp {detailOrder?.dibayar.toLocaleString()}</span>
+              </div>
             </div>
             <div className="flex justify-between text-lg font-black pt-2 border-t border-slate-100">
               <span className="text-slate-800 uppercase text-xs self-center">Belum Dibayar</span>
@@ -122,27 +149,27 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {detailOrder?.status !== 'lunas' && (
-            <button 
-              onClick={() => {
-                closeDetailModal(); // Tutup detail dulu
-                openPaymentModal(detailOrder); // Baru buka bayar
-              }}
-              className="w-full mt-2 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-xs font-black uppercase tracking-wider border border-emerald-100"
-            >
-              Klik untuk Bayar
-            </button>
-          )}
+          <button 
+            onClick={() => {
+              closeDetailModal(); // Tutup detail dulu
+              openPaymentModal(detailOrder); // Baru buka bayar
+            }}
+            className="w-full mt-2 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-xs font-black uppercase tracking-wider border border-emerald-100"
+          >
+            Klik untuk Bayar
+          </button>
 
           {/* ACTION BUTTONS */}
           <div className="grid grid-cols-2 gap-3 mt-8">
-            <button className="py-4 bg-slate-100 text-slate-600 rounded-2xl font-black uppercase text-[10px] tracking-widest">
+            <button
+              onClick={() => showToast('Belum ada fitur cetak struk', 'warning')} 
+              className="py-4 bg-slate-100 text-slate-600 rounded-2xl font-black uppercase text-[10px] tracking-widest">
               Print Struk
             </button>
             <button
-              onClick={() => {openConfirmModal(detailOrder);}} 
+              onClick={() => {handleConfirmWA(detailOrder);}} 
               className="py-4 bg-emerald-600 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-emerald-100">
-              Kirim Nota WA
+              Ingatkan di WA
             </button>
           </div>
         </div>
@@ -156,6 +183,17 @@ export default function Dashboard() {
       showToast('Masukkan nominal yang valid', 'error');
       return;
     }
+
+    // Hitung selisih pembayaran baru dengan yang lama untuk transaksi kas
+    const selisihBayar = nominalBayar - (selectedOrder.dibayar || 0);
+
+    // Jika tidak ada perubahan pembayaran, cukup tutup modal
+    if (selisihBayar <= 0) {
+      showToast('Nominal harus lebih besar dari pembayaran sebelumnya', 'info');
+      closeModal();
+      return;
+    }
+    
     let newStatus = 'belum';
     if (nominalBayar >= selectedOrder.total_harga) {
       newStatus = 'lunas';
@@ -164,18 +202,62 @@ export default function Dashboard() {
     }
 
     try {
-      const { error } = await supabase
+      // 1. Update tabel orders
+      const { error: orderError } = await supabase
         .from('orders')
         .update({ dibayar: nominalBayar, status: newStatus })
         .eq('id', selectedOrder.id);
-
-      if (error) throw error;
+      
+      if (orderError) throw orderError;
+        
+      // 2. Insert ke tabel transactions untuk mencatat perubahan kas
+      const { error: transactionError } = await supabase
+        .from('transactions')
+        .insert({
+          type: 'masuk',
+          amount: nominalBayar - (selectedOrder.dibayar || 0),
+          category: 'Pembayaran Order',
+          description: `Pembayaran ${newStatus.toUpperCase()} untuk ${selectedOrder.nama}`,
+          order_id: selectedOrder.id
+        });
+      if (transactionError) throw transactionError;
+      
       await refreshData(); // Refresh data setelah update
       showToast('Data pembayaran berhasil diperbarui', 'success');
       closeModal();
     } catch (error) {
       console.error('Error updating payment data:', error);
       showToast('Gagal memperbarui data pembayaran', 'error');
+    }
+  };
+
+  const handleResetPembayaran = async (order) => {
+    try {
+      // 1. Update tabel orders kembali ke nol
+      const { error: orderError } = await supabase
+        .from('orders')
+        .update({ 
+          dibayar: 0, 
+          status: 'belum' 
+        })
+        .eq('id', order.id);
+
+      if (orderError) throw orderError;
+
+      // 2. Hapus transaksi terkait order ini
+      const { error: transError } = await supabase
+        .from('transactions')
+        .delete()
+        .eq('order_id', order.id);
+
+      if (transError) throw transError;
+
+      showToast('Pembayaran berhasil direset', 'success');
+      refreshData();
+      closeDetailModal();
+    } catch (error) {
+      console.error(error);
+      showToast('Gagal menghapus pembayaran', 'error');
     }
   };
 
@@ -191,12 +273,30 @@ export default function Dashboard() {
     return matchesSearch && matchStatus;
   })
 
-  const openConfirmModal = (order) => {
-    setSelectedOrder(order);
-    setIsConfirmOpen(true);
-  }
+  const openConfirm = ({ title, message, onConfirm }) => {
+    setConfirmConfig({
+      isOpen: true,
+      title,
+      message,
+      onConfirm,
+    });
+  };
 
-  const handleKirimWA = (order) => {
+  const closeConfirm = () => {
+    setConfirmConfig(prev => ({ ...prev, isOpen: false }));
+  };
+
+  const handleConfirmWA = (order) => {
+    setSelectedOrder(order);
+
+    openConfirm({
+      title: 'Kirim Pesan WA?',
+      message: `Apakah Anda yakin ingin mengirim pesan WA ke ${order.nama}?`,
+      onConfirm: () => handleKirimWA(order),
+    });
+  };
+
+  const handleKirimWA = async (order) => {
     let pesan = "";
     
     if (order.status === 'dp') {
@@ -208,19 +308,31 @@ export default function Dashboard() {
     }
 
     if (!pesan) return;
-    sendWhatsApp(order.no_hp, pesan);
+    await  sendWhatsApp('085320561697', pesan);
     showToast('Notifikasi WA telah dikirim.', 'success');
   };
 
   return (
     <div className="p-4 md:p-8 bg-slate-50 min-h-screen pb-10">
       <ConfirmModal
-        isOpen={isConfirmOpen}
-        onClose={() => setIsConfirmOpen(false)}
-        onConfirm={handleKirimWA}
-        title={`Kirim Pesan WA?`}
-        message={`Apakah Anda yakin ingin mengirim pesan WA ke ${selectedOrder?.nama}?`}
-        isLoading={isSendingWA}
+        isOpen={confirmConfig.isOpen}
+        onClose={closeConfirm}
+        onConfirm={async () => {
+          if (!confirmConfig.onConfirm) return;
+
+          try {
+            setIsConfirmLoading(true);
+            await confirmConfig.onConfirm();
+            closeConfirm();
+          } catch (err) {
+            console.error(err);
+          } finally {
+            setIsConfirmLoading(false);
+          }
+        }}
+        title={confirmConfig.title}
+        message={confirmConfig.message}
+        isLoading={isConfirmLoading}
       />
       <h1 className="text-xl md:text-2xl font-bold mb-6 text-slate-800">Manajemen Pesanan</h1>
 
@@ -240,7 +352,7 @@ export default function Dashboard() {
             onClick={() => setFilterStatus(f)}
             className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap capitalize transition-all ${
               filterStatus === f 
-                ? 'bg-green-600 text-white shadow-md' 
+                ? 'bg-emerald-500 text-white shadow-md' 
                 : 'bg-white text-slate-500 border border-slate-200'
             }`}
             
@@ -259,7 +371,7 @@ export default function Dashboard() {
               
               {/* Badge Status Otomatis */}
               <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
-                order.status === 'lunas' ? 'bg-green-100 text-green-600' :
+                order.status === 'lunas' ? 'bg-green-100 text-emerald-600' :
                 order.status === 'dp' ? 'bg-yellow-100 text-yellow-600' : 'bg-slate-100 text-slate-500'
               }`}>
                 {order.status}
@@ -283,7 +395,7 @@ export default function Dashboard() {
 
             {/* Tombol WA */}
             <button 
-              onClick={(e) => { e.stopPropagation(); openConfirmModal(order); }}
+              onClick={(e) => { e.stopPropagation(); handleConfirmWA(order); }}
               className="w-10 h-10 bg-emerald-500 flex items-center justify-center rounded-xl text-white shadow-lg shadow-emerald-200 active:scale-90 transition-all"
             >
               <MessageCircle size={20} />
@@ -334,7 +446,7 @@ export default function Dashboard() {
 
               <button 
                 onClick={handleUpdateBayar}
-                className="w-full bg-green-600 hover:bg-accent-green-dark text-white font-bold py-4 rounded-2xl shadow-lg shadow-green-200 flex items-center justify-center gap-2 mt-4"
+                className="w-full bg-emerald-600 hover:bg-accent-emerald-600 text-white font-bold py-4 rounded-2xl shadow-lg shadow-green-200 flex items-center justify-center gap-2 mt-4"
               >
                 <Check size={20} /> Simpan Perubahan
               </button>

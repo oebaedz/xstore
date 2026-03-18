@@ -35,6 +35,7 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message, isLoading })
           <div className="flex gap-3 w-full">
             <button
               onClick={onClose}
+              disabled={isLoading}
               className="flex-1 py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-2xl transition-all"
             >
               Batal

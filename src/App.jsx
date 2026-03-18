@@ -15,6 +15,7 @@ import { ToastProvider } from "./context/ToastContext";
 import SuccessPage from "./pages/SuccsessPage";
 import SettingsPage from "./pages/SettingsPage";
 import RecapPage from "./pages/RecapPage";
+import BukuKas from "./pages/BukuKas";
 
 function App() {
   const itemsFromLocalStorage = JSON.parse(localStorage.getItem('cart')) || []
@@ -67,6 +68,7 @@ function App() {
                 </ProtectedRoute>
               }>
                 <Route path="/dashboard" element={<DashboardHome />} />
+                <Route path="/cash" element={<BukuKas />} />
                 <Route path="/products" element={<ProductSale />} />
                 <Route path="/products/add" element={<ProductFormPage />} />
                 <Route path="/products/edit/:id" element={<ProductFormPage />} />
