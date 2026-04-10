@@ -19,3 +19,39 @@
     @apply relative overflow-hidden transition-all duration-300 hover:scale-105 active:scale-95;
   }
 }
+
+/* Menghapus border bawaan yang kaku */
+#reader {
+  border: none !important;
+}
+
+/* Memaksa konten di dalam kotak dashboard jadi center */
+#reader__dashboard_section_csr {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  padding: 40px 20px !important;
+}
+
+/* Merapikan tampilan tombol dan link internal */
+#reader__dashboard_section_csr span {
+  display: block;
+  margin-bottom: 8px;
+}
+
+#reader__dashboard_section_csr a {
+  color: #4f46e5 !important; /* Warna indigo-600 */
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+/* Menghilangkan icon gambar yang kadang terlalu besar/tidak center */
+#reader img[alt="Info icon"], #reader img[alt="Camera icon"] {
+  display: none !important;
+}
+
+#reader__dashboard_section_csr > div > img { 
+  display: none !important
+}

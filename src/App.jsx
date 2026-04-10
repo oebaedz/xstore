@@ -16,6 +16,7 @@ import SuccessPage from "./pages/SuccsessPage";
 import SettingsPage from "./pages/SettingsPage";
 import RecapPage from "./pages/RecapPage";
 import BukuKas from "./pages/BukuKas";
+import AmbilOrder from "./pages/AmbilOrder";
 
 function App() {
   const itemsFromLocalStorage = JSON.parse(localStorage.getItem('cart')) || []
@@ -74,6 +75,7 @@ function App() {
                 <Route path="/products/edit/:id" element={<ProductFormPage />} />
                 <Route path="/recap" element={<RecapPage />} />
                 <Route path="/orders" element={<Dashboard />} />
+                <Route path="/scan" element={<AmbilOrder />} />
                 <Route path="/settings" element={<SettingsPage />} />
             </Route>
           </Routes>

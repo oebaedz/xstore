@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { LayoutDashboard, Package, ShoppingCart, Menu, LogOut, SettingsIcon, FilesIcon, Wallet } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, Menu, LogOut, SettingsIcon, FilesIcon, Wallet, HandHeart } from 'lucide-react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import supabase from '../createClient'
 
@@ -19,6 +19,7 @@ const AdminLayout = ({ children }) => {
     { name: 'Pesanan', icon: <ShoppingCart size={20} />, path: '/orders' },
     { name: 'Rekap', icon: <FilesIcon size={20} />, path: '/recap' },
     { name: 'Buku Kas', icon: <Wallet size={20} />, path: '/cash' },
+    { name: 'Ambil Order', icon: <HandHeart size={20} />, path: '/scan' },
     { name: 'Pengaturan', icon: <SettingsIcon size={20} />, path: '/settings' },
   ];
   const fetchAdminData = useCallback(async () => {

@@ -14,6 +14,8 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState('Semua');
+  const [isOrderClosed, setIsOrderClosed] = useState(false);
+
   const fetchAdminData = async () => {
     try {
       setLoading(true);
@@ -34,6 +36,7 @@ const Home = () => {
       setDataProducts(prodRes.data || []);
       setBanners(settingsRes.data?.find(s => s.key === 'hero_carousel')?.value || []);
       setDeadline(settingsRes.data?.find(s => s.key === 'po_schedule')?.value.end_date || null);
+      setIsOrderClosed(settingsRes.data?.find(s => s.key === 'po_schedule')?.value.status === 'closed' || false);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -79,33 +82,41 @@ const Home = () => {
               </div>
             </div>
 
-            {/* Horizontal Filter */}
-            <div className="flex mb-4 gap-2 md:gap-4 overflow-x-auto pb-4 no-scrollbar snap-x snap-mandatory">
-              {categories.map((f) => (
-                <button
-                  key={f}
-                  onClick={() => setFilterStatus(f)}
-                  className={`px-5 md:px-8 py-2 ease-out rounded-full text-xs md:text-lg tracking-wider font-semibold whitespace-nowrap capitalize transition-all snap-start duration-300 border ${
-                    filterStatus === f
-                      ? 'bg-gradient-to-r ml-1 from-emerald-600 to-green-500 text-white shadow-lg scale-105 border-transparent'
-                      : 'bg-white text-slate-600 border-slate-200 hover:border-emerald-400 hover:text-emerald-600'
-                  }`}
-                  
-                >
-                  {f}
-                </button>
-              ))}
-            </div>
+            { isOrderClosed ? (
+              <div className="bg-red-100 text-red-800 p-4 rounded-lg mb-12 text-center">
+                <p className="font-semibold">Pemesanan telah ditutup. Nantikan koleksi berikutnya!</p>
+              </div>
+            ) : (
+              <div>
+              {/* Horizontal Filter */}
+              <div className="flex mb-4 gap-2 md:gap-4 overflow-x-auto pb-4 no-scrollbar snap-x snap-mandatory">
+                {categories.map((f) => (
+                  <button
+                    key={f}
+                    onClick={() => setFilterStatus(f)}
+                    className={`px-5 md:px-8 py-2 ease-out rounded-full text-xs md:text-lg tracking-wider font-semibold whitespace-nowrap capitalize transition-all snap-start duration-300 border ${
+                      filterStatus === f
+                        ? 'bg-gradient-to-r ml-1 from-emerald-600 to-green-500 text-white shadow-lg scale-105 border-transparent'
+                        : 'bg-white text-slate-600 border-slate-200 hover:border-emerald-400 hover:text-emerald-600'
+                    }`}
+                    
+                  >
+                    {f}
+                  </button>
+                ))}
+              </div>
 
-            <div className="grid grid-cols-2 max-[400px]:grid-cols-1 md:grid-cols-3 gap-2 md:gap-10">
-              {filteredProducts.map((data) => {
-                return (
-                  <div key={data.id}>
-                    <ProductCard product={data} setIsCartOpen={setIsCartOpen} />
-                  </div>
-                );
-              })}
+              <div className="grid grid-cols-2 max-[400px]:grid-cols-1 md:grid-cols-3 gap-2 md:gap-10">
+                {filteredProducts.map((data) => {
+                  return (
+                    <div key={data.id}>
+                      <ProductCard product={data} setIsCartOpen={setIsCartOpen} />
+                    </div>
+                  );
+                })}
+              </div>
             </div>
+            )}
           </div>
         </section>
 
