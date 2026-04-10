@@ -64,7 +64,7 @@ const Home = () => {
     <>
       <div className="min-h-screen">
         <div className="flex flex-col h-[100svh] md:h-auto overflow-hidden">
-          <NewHero banners={banners} deadline={deadline} loading={loading} />
+          <NewHero banners={banners} deadline={deadline} loading={loading} isClosed={isOrderClosed} />
         </div>
 
         <section className="py-24 bg-gradient-to-b from-white to-gray-50">
@@ -83,8 +83,13 @@ const Home = () => {
             </div>
 
             { isOrderClosed ? (
-              <div className="bg-red-100 text-red-800 p-4 rounded-lg mb-12 text-center">
-                <p className="font-semibold">Pemesanan telah ditutup. Nantikan koleksi berikutnya!</p>
+              <div className="bg-primary/90 border-2 border-gold p-6 text-center animate-fade-in">
+                <h3 className="text-gold font-display text-xl font-bold tracking-widest uppercase">
+                  CHAPTER INI TELAH BERAKHIR
+                </h3>
+                <p className="text-white/70 text-xs mt-2 italic">
+                  "Jangan sampai ketinggalan di chapter berikutnya."
+                </p>
               </div>
             ) : (
               <div>

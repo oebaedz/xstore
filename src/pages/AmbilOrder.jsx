@@ -22,6 +22,21 @@ const AmbilOrder = () => {
     return () => scanner.clear();
   }, []);
 
+  const handleSerahkanBarang = async (orderId) => {
+    const { error } = await supabase
+      .from('orders')
+      .update({ 
+        status_order: 'selesai',
+        picked_up_at: new Date().toISOString() 
+      })
+      .eq('id', orderId);
+
+    if (!error) {
+      showToast("Barang telah diserahkan!", "success");
+      setScanResult(null); // Reset scanner untuk antrean berikutnya
+    }
+  };
+
   return (
     <div className="p-4 pb-20 space-y-6">
       <div id="reader" className="overflow-hidden rounded-[32px] border-none shadow-2xl"></div>

@@ -9,7 +9,7 @@ import 'swiper/css/pagination';
 import 'swiper/css/effect-coverflow';
 import Skeleton from "./newcomps/Skeleton";
 
-const NewHero = ({ banners = [], deadline, loading }) => {
+const NewHero = ({ banners = [], deadline, loading, isClosed }) => {
   const [selectedImg, setSelectedImg] = useState(null);
 
   const HeroSkeleton = () => {
@@ -93,7 +93,21 @@ const NewHero = ({ banners = [], deadline, loading }) => {
 
             {/* Countdown sekarang diletakkan di bawah text agar layout seimbang */}
             <div className="md:mt-10">
-              <Countdown deadline={deadline} />
+              { isClosed ? (
+                <div className="mx-3 md:mx-0 bg-primary/90 border border-gold p-6 text-center animate-fade-in">
+                  <h3 className="text-gold font-display text-sm md:text-xl font-bold tracking-widest uppercase">
+                    Pemesanan Chapter 3 Telah Ditutup
+                  </h3>
+                  <p className="text-white/70 text-xs mt-2 italic">
+                    "Sesuatu yang istimewa butuh waktu untuk diciptakan."
+                  </p>
+                  <button className="mt-4 bg-gradient-to-r from-emerald-600 to-green-500 text-white px-6 py-2 text-[10px] font-bold tracking-widest hover:bg-white transition-all">
+                    TUNGGU KAMI DI CHAPTER BERIKUTNYA!
+                  </button>
+                </div>
+              ) : (
+                <Countdown deadline={deadline} />
+              )}
             </div>
           </div>
 
